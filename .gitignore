@@ -42,11 +42,5 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-.idea/.name
-.idea/encodings.xml
-.idea/Game.iml
-.idea/misc.xml
-.idea/modules.xml
-.idea/scopes/scope_settings.xml
-.idea/vcs.xml
-.idea/workspace.xml
+.idea/*
+node_modules/*
