@@ -1,0 +1,41 @@
+
+body {
+    background: #222;
+    color: rgb(239, 244, 229);
+}
+
+.main_wrapper {
+    width: 1000px;
+    margin: auto;
+}
+
+.sep20 {
+    margin: 10px 0;
+    display: inline-block;
+    width: 100%;
+}
+.sep40 {
+    margin: 20px 0;
+    display: inline-block;
+    width: 100%;
+}
+#create_game_form {
+    color: #000000;
+    width: inherit;
+}
+#create_game_form .jumbotrono {
+    width: 600px;
+    line-height: 40px;
+    margin: auto;
+}
+
+#create_game_form input {
+    width: 350px;
+
+}
+
+#create_game_form textarea {
+    width: 350px;
+    height: 100px;
+    line-height: 25px;
+}

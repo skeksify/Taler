@@ -1,0 +1,11 @@
+Create your Game, game
+
+Client could create a game that people could play
+
+Client would be referred to as User and playing people would be Player
+
+The user can create a plot line that players follow.
+
+Players, when begin the game, create a Character. It has a name, Gender, Portrait, Alignment, Ability Scores and skills
+
+Players will face dialogs prepared by the user, alongside pictures to accompany each dialog

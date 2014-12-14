@@ -1,0 +1,121 @@
+.clr {
+    clear: both;
+}
+body {
+    background: #222;
+    color: rgb(239, 244, 229);
+    font-family: verdana;
+}
+
+.main_wrapper {
+    width: 1000px;
+    margin: auto;
+}
+
+.action-box {
+    display: none;
+    border-radius: 6px;
+    position: absolute;
+    width: 300px;
+    background: rgb(51, 51, 51);
+    left: 18px;
+    top: 71px;
+    padding-bottom: 45px; /* 30 for Abs Bottom Bar, 15 for space anyway */
+}
+
+.action-box .top-bar {
+    text-align: center;
+    background: linear-gradient(to bottom,rgb(60, 60, 60) 0,rgb(34, 34, 34) 100%);
+    line-height: 40px;
+    color: #fff;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.action-box .top-bar div {
+    display: inline-block;
+}
+.action-box .bottom-bar {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    text-align: center;
+    background: linear-gradient(to bottom,rgb(60, 60, 60) 0,rgb(34, 34, 34) 100%);
+    line-height: 30px;
+    color: #ccc;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    cursor: pointer;
+}
+
+.action-box .bottom-bar div:hover {
+    color: #fff;
+}
+.action-box .bottom-bar div:active {
+    background: linear-gradient(to bottom,rgb(34, 34, 34) 0,rgb(60, 60, 60) 100%);
+}
+
+.action-box .bottom-bar div {
+    display: inline-block;
+    width: 50%;
+}
+.action-box .not-last{
+    border-right: 1px solid rgb(85, 85, 85);
+}
+
+.action-box .cont {
+    padding: 15px 10px 30px;
+}
+
+.action-box .msg {
+    padding: 15px;
+    text-align: center;
+    display: none;
+}
+
+textarea.form-control.speech {
+    height: 140px;
+    line-height: 25px;
+}
+
+#drawing_panel {
+    display: none;
+}
+#drawing_board {
+    border-collapse: collapse;
+    display: table;
+}
+
+#drawing_board div {
+    color: #000;
+    border: 0px solid black;
+}
+
+#drawing_board .entry{
+    padding: 10px 0;
+    border: 0px solid;
+    display: table-row;
+}
+
+#drawing_board .entryLabel{
+    padding: 10px;
+}
+#drawing_board .replyLabel{
+    padding: 10px;
+}
+
+#drawing_board .reply{
+    border: 1px solid;
+    padding: 10px;
+    display: table-row;
+
+}
+#drawing_board .replyHolder{
+    vertical-align: middle;
+    display: table-cell;
+}
+
+#drawing_board .tableBox {
+    border-collapse: collapse;
+    display: table;
+}

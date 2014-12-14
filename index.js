@@ -13,3 +13,4 @@ var global_models = {
 };
 
 global_models.server.init_server(global_models.router.get_action)
+

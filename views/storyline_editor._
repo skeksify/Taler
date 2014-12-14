@@ -1,0 +1,54 @@
+<script type="text/javascript" src="/rj/jquery.jsPlumb-1.7.2-min.js"></script>
+<script type="text/javascript" src="/rj/storyline_editor.js"></script>
+<link href="/rs/storyline_editor.css" rel="stylesheet"/>
+<div class="action-box" id="new_entry_box">
+    <div class="top-bar">
+        <div>
+            Add New Entry
+        </div>
+    </div>
+    <div class="cont">
+        <form role="form">
+            <fieldset>
+                <!-- Text input-->
+                <div class="control-group">
+                    <label class="control-label" for="new_enty_labelI">Label:</label>
+                    <div class="controls">
+                        <input id="new_enty_labelI" type="text" placeholder="Personal Use" class="form-control" required="">
+                    </div>
+                    <br/>
+                    <label class="control-label" for="new_enty_speechI">Speech:</label>
+                    <div class="controls">
+                        <textarea id="new_enty_speechI" class="form-control speech" required=""></textarea>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="msg"></div>
+    <div class="clr"></div>
+    <div class="bottom-bar">
+        <div class="not-last cancel">
+            Cancel
+        </div><div class="ok">
+            Ok
+        </div>
+    </div>
+</div>
+<div class=" theme-showcase" role="main">
+    <div class="board">
+        <!-- Form Name -->
+        <h3><%=headerTitle%></h3>
+        <div class="panel panel-default" id="drawing_panel">
+            <div class="panel-heading">
+                Story!
+            </div>
+            <div class="panel-body" id="drawing_board">
+                Yeah!
+            </div>
+        </div>
+        <input type="button" class="btn btn-add" value="Begin" style="margin-top: 20px">
+
+    </div>
+</div>
+
