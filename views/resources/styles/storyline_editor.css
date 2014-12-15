@@ -22,6 +22,9 @@ body {
     top: 71px;
     padding-bottom: 45px; /* 30 for Abs Bottom Bar, 15 for space anyway */
 }
+.action-box .fw{
+    display: none;
+}
 
 .action-box .top-bar {
     text-align: center;
@@ -63,8 +66,8 @@ body {
     border-right: 1px solid rgb(85, 85, 85);
 }
 
-.action-box .cont {
-    padding: 15px 10px 30px;
+.action-box .wrappers-wrapper {
+    padding: 10px;
 }
 
 .action-box .msg {
@@ -78,72 +81,76 @@ textarea.form-control.speech {
     line-height: 25px;
 }
 
-#drawing_panel {
-    display: none;
+.drawing_panel {
+    background-color: #262626;
 }
-#drawing_board {
+.drawing_board {
     border-collapse: collapse;
     display: table;
     font-size: 11px;
     width: 100%;
 }
 
-#drawing_board div {
-    color: #000;
+.drawing_board div {
+    color: #fff;
     border: 0px solid black;
 }
 
-#drawing_board .entry{
+.drawing_board .entry{
     width: 100%;
     border: 0px solid;
     display: table-row;
 }
-#drawing_board .reply{
+.drawing_board .reply{
     border: 0px solid;
     /*display: table-row;*/
     padding: 0 10px;
     margin: 10px 0;
 }
 
-#drawing_board .entryLabel{
+.drawing_board .entryLabel{
     padding: 5px;
     border: 1px solid;
     font-style: italic;
 }
-#drawing_board .replyLabel{
+.drawing_board .replyLabel{
     padding: 5px;
     border: 1px solid;
 }
 
-#drawing_board .reply.notLeaf{
+.drawing_board .reply.notLeaf{
     border-bottom: 1px solid;
     border-left: 0px solid;
 }
-#drawing_board .replyLabel.notLeaf{
+.drawing_board .replyLabel.notLeaf{
     border-right: 0;
 }
 
-#drawing_board .add-entry{
+.drawing_board .add-entry{
     line-height: 10px;
     padding: 0;
     cursor: pointer;
 }
-#drawing_board .add-reply{
+.drawing_board .add-reply{
     line-height: 10px;
     padding: 0;
     cursor: pointer;
 }
 
-#drawing_board .replyLabel.p:hover{
+.drawing_board .replyLabel.p:hover{
     background: #aaa;
 }
 
-#drawing_board .replyHolder{
+.drawing_board .replyHolder{
     vertical-align: middle;
     display: table-cell;
 }
 
-#drawing_board .tableBox {
+.drawing_board .tableBox {
     border-collapse: collapse;
     display: table;
+}
+
+.entity-form-wrapper, .board-form-wrapper {
+    display: none;
 }
