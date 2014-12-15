@@ -15,7 +15,7 @@ body {
 .action-box {
     display: none;
     border-radius: 6px;
-    position: fixed;
+    position: absolute;
     width: 300px;
     background: rgb(51, 51, 51);
     left: 18px;
@@ -87,8 +87,6 @@ textarea.form-control.speech {
 .drawing_board {
     border-collapse: collapse;
     display: table;
-    font-size: 11px;
-    width: 100%;
 }
 
 .drawing_board div {

@@ -3,7 +3,7 @@
 <link href="/rs/storyline_editor.css" rel="stylesheet"/>
 <div class="action-box" id="action_box_id">
     <div class="top-bar">
-        <div class="title">
+        <div>
             Add New Entry
         </div>
     </div>
