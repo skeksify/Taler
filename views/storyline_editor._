@@ -3,7 +3,7 @@
 <link href="/rs/storyline_editor.css" rel="stylesheet"/>
 <div class="action-box" id="new_entry_box">
     <div class="top-bar">
-        <div>
+        <div class="title">
             Add New Entry
         </div>
     </div>
@@ -12,14 +12,14 @@
             <fieldset>
                 <!-- Text input-->
                 <div class="control-group">
-                    <label class="control-label" for="new_enty_labelI">Label:</label>
+                    <label class="control-label" for="new_entry_labelI">Label:</label>
                     <div class="controls">
-                        <input id="new_enty_labelI" type="text" placeholder="Personal Use" class="form-control" required="">
+                        <input id="new_entry_labelI" type="text" placeholder="Personal Use" class="form-control" required="">
                     </div>
                     <br/>
-                    <label class="control-label" for="new_enty_speechI">Speech:</label>
+                    <label class="control-label" for="new_entry_speechI">Speech:</label>
                     <div class="controls">
-                        <textarea id="new_enty_speechI" class="form-control speech" required=""></textarea>
+                        <textarea id="new_entry_speechI" class="form-control speech" required=""></textarea>
                     </div>
                 </div>
             </fieldset>

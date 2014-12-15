@@ -5,24 +5,85 @@
 var Tmed = 500;
 var board_references = [];
 var board_ref_indexer = 0;
-var board = new storyline_board();
-
+var board = new storylineBoard();
+var cl = function(c,f, cond){ if((f || 0) && (typeof(cond)=='undefined' || (typeof(cond)!='undefined' && cond))) console.log(c) };
 
 $(document).ready(function(){
     $('.btn-add').click(function(){
         open_dialog();
     });
+    //make(); redraw();
+});
+
+/*HAHA
+ MuLTIPLLL BORDZZZZ
+ */
+function setBoardBindings(){
+
     $('#new_entry_box .bottom-bar .cancel').click(function(){
         close_dialog();
     });
 
-    $('#new_entry_box .bottom-bar .ok').click(function(){
-        add_new_entry();
-    });
-    make(); redraw();
-});
+    $('#drawing_board .add-entry').click({type: 0}, engageNewEntity);
+    $('#drawing_board .add-reply').click({type: 1}, engageNewEntity);
+}
 
-function storyline_board(settings){
+function engageNewEntity(paramObject){
+    var that = this; // Keeping the invoking element
+    var entityType = paramObject.data.type;
+    //Color and selectize
+    $('#new_entry_box .title').html('Add New '+(entityType?'Reply':'Entry'));
+    open_dialog();
+
+    $('#new_entry_box .ok').unbind().click(function(){
+        var updatedEntity = null;
+        var entityToUpdate = getEntity.call(that, !entityType);
+        if(entityType){ //Reply
+            var replyLabel = $('#new_entry_labelI').val();
+            var speech = $('#new_entry_speechI').val();
+            updatedEntity = entityToUpdate.addReply(new Reply({replyLabel: replyLabel, speech: speech}));
+            close_dialog('"'+updatedEntity.replyLabel+'" added successfully!', redraw);
+        } else { //Entry
+            var replyLabel = $('#new_entry_labelI').val();
+            var speech = $('#new_entry_speechI').val();
+            updatedEntity = entityToUpdate.setLeadsTo(new Entry({entryLabel: replyLabel, speech: speech}));
+            close_dialog('"'+updatedEntity.entryLabel+'" added successfully!', redraw);
+        }
+    });
+    // Propagate /this/
+}
+/*
+ MuLTIPLLL BORDZZZZ
+ */
+function getEntity(entityType){
+    var add_button = $(this);
+    var parent_replies = add_button.parents('[replynumber]');
+    var parent_replies_numbers = [];
+    parent_replies.each(function(){
+        var reply_number = $(this).attr('replynumber');
+        parent_replies_numbers.push(reply_number);
+    });
+    parent_replies_numbers.reverse(); // Was running in out, need path from root
+    return getEntityByPath(parent_replies_numbers, entityType);
+}
+
+function getEntityByPath(path, entityType){ cl(path,1);
+    var nextEntry, thisReply;
+    var resultEntry = board.interactionTree;
+    if(typeof(path)=='object' && path.length && resultEntry instanceof Entry){
+        for(var i in path){
+            if((parseInt(i)+1)!=path.length || !entityType)
+                if((thisReply = resultEntry.replies[path[i]]) instanceof Reply && (nextEntry = thisReply.leadsTo) instanceof Entry)
+                    resultEntry = nextEntry;
+                else
+                    return console.error('Path error');
+        }
+    }
+
+    return entityType ? resultEntry.replies[path[path.length-1]] : resultEntry;
+}
+
+function storylineBoard(settings){
     this.interactionTree = null;
     this.initialized = false;
     this.add = function(newEntry){
@@ -38,7 +99,7 @@ function Entry(settings){
     this.entryLabel = settings.entryLabel;
     this.speech = settings.speech;
     this.replies = [];
-    this.onUpdate = function(){ console.log('Entry Updated'); };
+    this.onUpdate = function(){ cl('Entry Updated'); };
     this.addReply = function(reply){
         if(reply instanceof Reply){
             this.replies.push(reply);
@@ -59,7 +120,7 @@ function Reply(settings){
     this.speech = settings.speech;
     this.replyType = settings.replyType;
     this.leadsTo = null;
-    this.onUpdate = function(){ console.log('Reply Updated'); };
+    this.onUpdate = function(){ cl('Reply Updated'); };
     this.setLeadsTo = function(leadsTo){
         switch (Object.getPrototypeOf(leadsTo)){
             case Entry.prototype:
@@ -67,6 +128,7 @@ function Reply(settings){
                 this.onUpdate();
                 break;
         }
+        return this.leadsTo;
     }
     this.follow = function(){
         return this.leadsTo;
@@ -76,7 +138,7 @@ function Reply(settings){
 function Action(settings){
     this.leadsTo = settings.leadsTo;
     this.action = settings.action;
-    this.onUpdate = function(){ console.log('Action Updated'); };
+    this.onUpdate = function(){ cl('Action Updated'); };
 
     this.setLeadsTo = function(leadsTo){
         this.leadsTo = leadsTo;
@@ -84,7 +146,7 @@ function Action(settings){
     }
 }
 
-function add_new_entry(leading_option){
+function addNewEntry(leading_option){
     //ToDo Validation and balloon notif
     var label_value = $('#new_enty_labelI').val();
     var speech_value = $('#new_enty_speechI').val();
@@ -93,7 +155,7 @@ function add_new_entry(leading_option){
 
     } else {
         // Has a father!
-        console.log('Has a father!');
+        cl('Has a father!');
     }
     redraw();
     close_dialog('DONE!');
@@ -104,14 +166,23 @@ function redraw(){
         var dr_p = $('#drawing_panel');
         var dr_b = $("#drawing_board");
         dr_p.fadeOut(Tmed, function(){
-            dr_b.html(recur_draw_entry(board.interactionTree));
+            dr_b.html(recur_draw_entry(board.interactionTree, 0));
+            setBoardBindings();
             dr_p.fadeIn(Tmed);
             //goPlumb();
         });
     }
 }
-
-function recompile_board(boardJSON){
+/*
+ MuLTIPLLL BORDZZZZ
+ */
+/*
+ MuLTIPLLL BORDZZZZ
+ */
+/*
+ MuLTIPLLL BORDZZZZ
+ */
+function recompileBoard(boardJSON){
     var pseuBoard;
     if(typeof(boardJSON)=='string')
         pseuBoard = JSON.parse(boardJSON);
@@ -119,41 +190,46 @@ function recompile_board(boardJSON){
         pseuBoard = boardJSON;
 
     if(pseuBoard.initialized){
-        var tmpBoard = new storyline_board();
-        tmpBoard.add(recur_make_entry(pseuBoard.interactionTree));
+        var tmpBoard = new storylineBoard();
+        tmpBoard.add(recurMakeEntry(pseuBoard.interactionTree)); //Init Recursion
         board = tmpBoard;
     }
     else
         return 'you got shit';
 }
 
-function recur_make_entry(pseuEntry){
+function recurMakeEntry(pseuEntry){
     var resultEntry = new Entry({entryLabel: pseuEntry.entryLabel, speech: pseuEntry.speech});
     for(var index in pseuEntry.replies){
         var iter_pseuReply = pseuEntry.replies[index];
         var iter_reply = new Reply({replyLabel: iter_pseuReply.replyLabel, speech: iter_pseuReply.speech});
         if(iter_pseuReply.leadsTo) // Continue Condition, means you haven't reached a leaf (Reply that ends the dialog)
-            iter_reply.setLeadsTo(recur_make_entry(iter_pseuReply.leadsTo));
+            iter_reply.setLeadsTo(recurMakeEntry(iter_pseuReply.leadsTo));
         resultEntry.addReply(iter_reply);
     }
     return resultEntry;
 }
 
-function recur_draw_entry(entry){
+function recur_draw_entry(entry, idEnumerator){
     if(entry instanceof Entry){
         var resultString = [];
-        resultString.push('<div class="entry">');
+        resultString.push('<div class="entry">');// id="'+idEnumerator+' MAYBE NO ENUMERATOR?!
             resultString.push('<div class="replyHolder">');
                 resultString.push('<div class="entryLabel">' + entry.entryLabel + '</div>');
             resultString.push('</div>');
             resultString.push('<div class="replyHolder">');
             for(var index in entry.replies){
+                cl(index+'-'+entry.replies.length, 0);
                 var iter_reply = entry.replies[index];
                 //debugger;
                 if(iter_reply instanceof Reply){
-                    resultString.push('<div class="reply">');
+                    resultString.push('<div class="reply'+(iter_reply.leadsTo?' notLeaf':'')+'" replynumber="'+index+'">');
                         resultString.push('<div class="replyHolder">');
-                            resultString.push('<div class="replyLabel">' + iter_reply.replyLabel + '</div>');
+                            resultString.push('<div class="replyLabel'+(iter_reply.leadsTo?' notLeaf':'')+'">');
+                                resultString.push(iter_reply.replyLabel);
+                                if(!iter_reply.leadsTo)
+                                    resultString.push('<div class="add-entry" toreplynumber="'+index+'" style="float: right">+</div>');
+                            resultString.push('</div>');
                         resultString.push('</div>');
                         resultString.push('<div class="replyHolder">');// Transition between answer to new Entry
                         if(iter_reply.leadsTo) // Continue Condition
@@ -162,6 +238,12 @@ function recur_draw_entry(entry){
                     resultString.push('</div>');
                 }
             }
+            /* New reply */
+                resultString.push('<div class="reply">');
+                    resultString.push('<div class="replyHolder">');
+                        resultString.push('<div class="replyLabel add-reply">+</div>');
+                    resultString.push('</div>');
+                resultString.push('</div>');
             resultString.push('</div>');
             resultString.push('<div class="clr"></div>');
         resultString.push('</div>');
@@ -217,7 +299,13 @@ function close_dialog(msg, callback){
 
 function make(){
     var tmpObj = {"interactionTree":{"entryLabel":"First Entry","speech":"Hello there","replies":[{"replyLabel":"Sup","speech":"Hi, I'm Ben, what's your name?","leadsTo":{"entryLabel":"Second Entry!","speech":"I'm Greg bitch, you lookin' for work?","replies":[{"replyLabel":"Yes","speech":"Yeah man, gimmy whacha got","leadsTo":null},{"replyLabel":"No","speech":"Gotta go! BYE","leadsTo":null},{"replyLabel":"New Reply","speech":"Hmm","leadsTo":null},{"replyLabel":"Another Reply","speech":"Hmm2","leadsTo":null}]}},{"replyLabel":"No talk","speech":"Gotta go! BYE","leadsTo":{"entryLabel":"Why not?!","speech":"wyyyy","replies":[{"replyLabel":"What do you mean?","speech":"Hmm2","leadsTo":null},{"replyLabel":"Because Fuck you!","speech":"Hmm2","leadsTo":null}]}},{"replyLabel":"Fight","speech":"Hey man, you just fucked with the wrong guy","leadsTo":null}]},"initialized":true};
-    recompile_board(tmpObj);
+    tmpObj = {"interactionTree":{"entryLabel":"Hi there, what can I do for you?","replies":[{"replyLabel":"Hi, I need some beans","leadsTo":{"entryLabel":"Beans? Sure, five cent a kilo, coo?","replies":[{"replyLabel":"Five cent? Sure, give me 3","leadsTo":null},{"replyLabel":"What?! Too bloody expensive man","leadsTo":null}]}},{"replyLabel":"Hi, I need some peas","leadsTo":{"entryLabel":"Peas? Sorry lad, none here","replies":[{"replyLabel":"Ah, too bad. Thanks","leadsTo":null}]}},{"replyLabel":"Nothing much yo","leadsTo":null}]},"initialized":true};
+    tmpObj = {"interactionTree":{"entryLabel":"Hi there, what can I do for you?","replies":[{"replyLabel":"Hi, I need some beans","leadsTo":{"entryLabel":"Beans? Sure, five cent a kilo, coo?","replies":[{"replyLabel":"Five cent? Sure, give me 3","leadsTo":{"entryLabel":"Three it is!","replies":[{"replyLabel":"Thanks sir!","leadsTo":null},{"replyLabel":"*Nod*","leadsTo":null},{"replyLabel":"Thanks for nothing","leadsTo":null}]}},{"replyLabel":"What?! Too bloody expensive man","leadsTo":{"entryLabel":"Alright alright, 3 cent","replies":[{"replyLabel":"Great!","leadsTo":null},{"replyLabel":"You know what, here's 4","leadsTo":null}]}}]}},{"replyLabel":"Hi, I need some peas","leadsTo":{"entryLabel":"Peas? Sorry lad, none here","replies":[{"replyLabel":"Ah, too bad. Thanks","leadsTo":null},{"replyLabel":"Come on, go check in the back","leadsTo":null},{"replyLabel":"LIER!","leadsTo":{"entryLabel":"HEYO! CHILL!","replies":[{"replyLabel":"Time to die!","leadsTo":null},{"replyLabel":"Ok ok, sorry","leadsTo":null}]}}]}},{"replyLabel":"Nothing much yo","leadsTo":null}]},"initialized":true};
+    recompileBoard(tmpObj);
+}
+
+function mj(){
+    return JSON.stringify(board);
 }
 
 function goPlumb(){
@@ -279,7 +367,18 @@ function goPlumb(){
 }
 
 
+function save_board(){
+    localStorage.setItem('board_1', mj());
+    alert('Saved!\r\n\r\n\r\n\r\n'+localStorage.getItem('board_1'));
+}
 
+function load_board(){
+    if(1 || confirm('Are you sure you want to load?')){
+        var loadedBoard = localStorage.getItem('board_1');
+        recompileBoard(JSON.parse(loadedBoard));
+        redraw();
+    }
+}
 
 
 

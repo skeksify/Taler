@@ -15,7 +15,7 @@ body {
 .action-box {
     display: none;
     border-radius: 6px;
-    position: absolute;
+    position: fixed;
     width: 300px;
     background: rgb(51, 51, 51);
     left: 18px;
@@ -84,6 +84,8 @@ textarea.form-control.speech {
 #drawing_board {
     border-collapse: collapse;
     display: table;
+    font-size: 11px;
+    width: 100%;
 }
 
 #drawing_board div {
@@ -92,24 +94,50 @@ textarea.form-control.speech {
 }
 
 #drawing_board .entry{
-    padding: 10px 0;
+    width: 100%;
     border: 0px solid;
     display: table-row;
 }
+#drawing_board .reply{
+    border: 0px solid;
+    /*display: table-row;*/
+    padding: 0 10px;
+    margin: 10px 0;
+}
 
 #drawing_board .entryLabel{
-    padding: 10px;
+    padding: 5px;
+    border: 1px solid;
+    font-style: italic;
 }
 #drawing_board .replyLabel{
-    padding: 10px;
-}
-
-#drawing_board .reply{
+    padding: 5px;
     border: 1px solid;
-    padding: 10px;
-    display: table-row;
-
 }
+
+#drawing_board .reply.notLeaf{
+    border-bottom: 1px solid;
+    border-left: 0px solid;
+}
+#drawing_board .replyLabel.notLeaf{
+    border-right: 0;
+}
+
+#drawing_board .add-entry{
+    line-height: 10px;
+    padding: 0;
+    cursor: pointer;
+}
+#drawing_board .add-reply{
+    line-height: 10px;
+    padding: 0;
+    cursor: pointer;
+}
+
+#drawing_board .replyLabel.p:hover{
+    background: #aaa;
+}
+
 #drawing_board .replyHolder{
     vertical-align: middle;
     display: table-cell;
