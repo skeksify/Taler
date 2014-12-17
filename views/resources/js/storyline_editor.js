@@ -24,7 +24,7 @@ function Board(settings){
 }
 
 function Entry(settings){
-    var defaults = {
+    var defaults =  {
         entryLabel: '',
         entrySpeech: '',
         replies: []
@@ -183,7 +183,7 @@ function recur_draw_entry(entry){
         var resultString = [];
         resultString.push('<div class="entry">');
             resultString.push('<div class="replyHolder">');
-                resultString.push('<div class="entryLabel">' + entry.entryLabel + '</div>');
+                resultString.push('<div class="entryLabel" title="'+entry.entrySpeech+'">' + entry.entryLabel + '</div>');
             resultString.push('</div>');
             resultString.push('<div class="replyHolder">');
             for(var index in entry.replies){
@@ -191,7 +191,7 @@ function recur_draw_entry(entry){
                 if(iter_reply instanceof Reply){
                     resultString.push('<div class="reply'+(iter_reply.leadsTo?' notLeaf':'')+'" replynumber="'+index+'">');
                         resultString.push('<div class="replyHolder">');
-                            resultString.push('<div class="replyLabel'+(iter_reply.leadsTo?' notLeaf':'')+'">');
+                            resultString.push('<div class="replyLabel'+(iter_reply.leadsTo?' notLeaf':'')+'" title="'+iter_reply.replySpeech+'">');
                             resultString.push(iter_reply.replyLabel);
                             if(!iter_reply.leadsTo)
                                 resultString.push('<div class="add-entry" toreplynumber="'+index+'" style="float: right">+</div>');
@@ -248,10 +248,10 @@ function redraw(who){
         var markup = [];
         var navBarMarkup = [];
         for(var i in boards){
-            markup.push('<div class="panel panel-default drawing_panel" boardid="'+i+'">');
-            markup.push('<div class="panel-heading">');
-            markup.push(boards[i].title);
-            markup.push('</div>');
+            markup.push('<div class="panel drawing_panel" boardid="'+i+'">');
+                markup.push('<div class="board-title">');
+                    markup.push(boards[i].boardTitle);
+                markup.push('</div>');
             markup.push('<div class="panel-body drawing_board">');
             markup.push(recur_draw_entry(boards[i].interactionTree));
             markup.push('</div>');
@@ -281,8 +281,11 @@ function save_playground(){
 function load_playground(){
     if(1 || confirm('Are you sure you want to load?')){
         var loadedPlayground = localStorage.getItem('playground');
-        recompilePlayground(JSON.parse(loadedPlayground));
-        redraw();
+        var playgroundObj = JSON.parse(loadedPlayground);
+        if(isOb(playgroundObj)){
+            recompilePlayground(playgroundObj);
+            redraw();
+        }
     }
 }
 
@@ -371,4 +374,5 @@ $(document).ready(function(){
         });
 
     });
+    load_playground(); //Try
 });
