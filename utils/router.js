@@ -12,7 +12,7 @@ var allowed = {
         },
         'game': {
             path: '../models/play/game.js',
-            actions: ['create','storyline_editor']
+            actions: ['create','storyline_editor','create_character']
         }
     }
 }

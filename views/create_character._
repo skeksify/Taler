@@ -1,0 +1,5 @@
+<script type="text/javascript" src="/rj/hexagon.js"></script>
+<link href="/rs/create_character.css" rel="stylesheet"/>
+<div class="canvas_holder">
+    <canvas id="hexagon" width="400" height="400"></canvas>
+</div>

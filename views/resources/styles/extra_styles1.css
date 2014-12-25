@@ -1,6 +1,15 @@
+
 body {
+    background: #222;
+    color: rgb(239, 244, 229);
+    font-family: verdana;
     padding-top: 70px;
     padding-bottom: 30px;
+}
+
+.main_wrapper {
+    margin: auto;
+    width: 66%;
 }
 
 .theme-dropdown .dropdown-menu {
@@ -15,4 +24,8 @@ body {
 
 .theme-showcase .navbar .container {
     width: auto;
+}
+
+.clr {
+    clear: both;
 }

@@ -47,7 +47,7 @@ function draw_hexagon() {
     hex(context, {cx: 200, cy: 200, rad: 100});
     hex(context, {cx: 200, cy: 200, rad: 150});
     hex_diagonals(context, {cx: 200, cy: 200, rad: 150});
-}
+} 
 
 $(document).ready(function () {
     draw_hexagon();
