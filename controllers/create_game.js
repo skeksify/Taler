@@ -5,29 +5,27 @@
 var fs = require("fs");
 var _ = require("underscore");
 
-function create_game(){
+function create_game(metadata){
     var view = read_template('create_game');
-    var metadata = {
-        headerTitle: 'Create New Game',
-        submitButton: 'Create Game'
-    };
     return _.template(view)(metadata);
 }
 
-
-
-function header(){
-    return read_template('header');
+function header(metadata){
+    return _.template(read_template('header'))(metadata);
 }
-function footer(){
-    return read_template('footer');
+function footer(metadata){
+    return _.template(read_template('footer'))(metadata);
 }
 
 exports.get_view = function(){
     var result = [];
-    result.push(header());
-    result.push(create_game());
-    result.push(footer());
+    var metadata = {
+        headerTitle: 'Create New Game',
+        submitButton: 'Create Game'
+    };
+    result.push(header(metadata));
+    result.push(create_game(metadata));
+    result.push(footer(metadata));
     return result.join('\r\n');
 }
 

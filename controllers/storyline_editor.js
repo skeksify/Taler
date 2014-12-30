@@ -5,28 +5,32 @@
 var fs = require("fs");
 var _ = require("underscore");
 
-function editor(){
+function editor(metadata){
     var view = read_template('storyline_editor');
-    var metadata = {
-        headerTitle: 'Storyline Editor',
-        submitButton: 'Create Game'
-    };
     return _.template(view)(metadata);
 }
 
 
-function header(){
-    return read_template('header');
+function header(metadata){
+    return _.template(read_template('header'))(metadata);
 }
-function footer(){
-    return read_template('footer');
+function footer(metadata){
+    return _.template(read_template('footer'))(metadata);
 }
 
 exports.get_view = function(){
     var result = [];
-    result.push(header());
-    result.push(editor());
-    result.push(footer());
+    var metadata = {
+        headerTitle: 'Storyline Editor',
+        submitButton: 'Create Game'
+    };
+    var headersActive = ['ccAc','cgAc'];
+    for(var i in headersActive)
+        metadata[headersActive[i]] = '';
+    metadata.cgAc = ' class="active"';
+    result.push(header(metadata));
+    result.push(editor(metadata));
+    result.push(footer(metadata));
     return result.join('\r\n');
 }
 
