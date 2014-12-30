@@ -6,27 +6,28 @@ var my_hex;
 function draw_hexagon() {
     var create_character_canvas = document.getElementById("hexagon");
     var context = create_character_canvas.getContext('2d');
-    var rad = 240;
+    var rad = 140;
     var levels = 7;
     var distance = rad / levels;
+    var cosine = Math.cos(Math.PI/6);
     var vertices = {
         STR: function (x, y, rad) {
             return {x: x, y: y - rad};
         },
         DEX: function (x, y, rad) {
-            return {x: x + rad, y: y - rad / 2};
+            return {x: x + rad*cosine, y: y - rad / 2};
         },
         CON: function (x, y, rad) {
-            return {x: x + rad, y: y + rad / 2};
+            return {x: x + rad*cosine, y: y + rad / 2};
         },
         INT: function (x, y, rad) {
             return {x: x, y: y + rad};
         },
         WIS: function (x, y, rad) {
-            return {x: x - rad, y: y + rad / 2};
+            return {x: x - rad*cosine, y: y + rad / 2};
         },
         CHA: function (x, y, rad) {
-            return {x: x - rad, y: y - rad / 2};
+            return {x: x - rad*cosine, y: y - rad / 2};
         }
     }
     var abilityCaptions = {
@@ -67,7 +68,7 @@ function draw_hexagon() {
                     context.fillStyle = '#eee';
                     context.fillText(Ability, nextPoint.x + abilityCaptions[Ability].x, nextPoint.y + abilityCaptions[Ability].y);
                 } else if(Ability=='DEX'){
-                    context.font = 'italic 16px Arial';
+                    context.font = 'italic 14px Arial';
                     context.fillStyle = '#eee';
                     var mod = levels-i-2;
                     context.fillText((mod>-1?'+':'')+mod, nextPoint.x-4, nextPoint.y);
@@ -98,18 +99,38 @@ function draw_hexagon() {
             y: vertices.STR(x, y, (set.STR * distance) + (distance * 2)).y
         };
         context.moveTo(start.x, start.y);
-        for (var Ability in set) {
+        for (var Ability in vertices) {
             var nextPoint = vertices[Ability](x, y, (set[Ability] * distance) + (distance * 2));
             context.lineTo(nextPoint.x, nextPoint.y);
         }
         context.lineTo(start.x, start.y);
         context.stroke();
-
     }
 
+    this.drawFromCreateCharBoard = function(){
+        var stats = {
+            STR: $('#str_id').val(),
+            DEX: $('#dex_id').val(),
+            CON: $('#con_id').val(),
+            INT: $('#int_id').val(),
+            WIS: $('#wis_id').val(),
+            CHA: $('#cha_id').val()
+        }
+        this.draw_set(stats);
+    }
+}
+
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+    };
 }
 
 $(document).ready(function () {
     my_hex = new draw_hexagon();
-    my_hex.init({width: 600, height: 600});
+
+    my_hex.init({width: 420, height: 400});
+    my_hex.drawFromCreateCharBoard();
 })
