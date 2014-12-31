@@ -14,7 +14,7 @@ function character(settings) {
 function steps_tracker() {
     var current_step = 0;
     var step_validated = [];
-    var ability_score_bank = 30;
+    var ability_score_bank = 20;
 
     this.updateBankLabel = function () {
         $('#bank_label').html('Points left: ' + ability_score_bank);
@@ -24,8 +24,9 @@ function steps_tracker() {
         var mod = parseInt(modifier);
         var old = $('#'+ability+'_id');
         var old_val = old.val() ? parseInt(old.val()) : 0;
-        if(ability_score_bank-old_val>0){
-            ability_score_bank -= old_val*mod;
+        var new_bank_subtraction = mod==1?old_val+1:-old_val;
+        if(ability_score_bank-new_bank_subtraction>=0){
+            ability_score_bank -= new_bank_subtraction;
             old.val(old_val+mod);
             this.updateBankLabel();
             my_hex.drawFromCreateCharBoard();
@@ -56,6 +57,7 @@ function steps_tracker() {
             this.setStep(current_step + modifier);
         }
     }
+    this.updateBankLabel();
 }
 
 $(document).ready(function () {
@@ -85,7 +87,7 @@ $(document).ready(function () {
         });
     });
     // Jump to second phase:
-    if (0) {
+    if (1) {
         $('[fvalue=male]').click();
         $('[step=' + 1 + '] .next').click();
     }

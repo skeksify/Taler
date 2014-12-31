@@ -31,7 +31,7 @@ function draw_hexagon() {
         }
     }
     var abilityCaptions = {
-        STR: {x: -10, y: -10},
+        STR: {x: -15, y: -10},
         DEX: {x: 5, y: -5},
         CON: {x: 5, y: 5},
         INT: {x: -15, y: 20},

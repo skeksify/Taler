@@ -84,7 +84,9 @@
     height: 400px;
     border: 0px solid black;
 }
-
+.abilities_controls .panel * {
+    cursor: default;
+}
 .abilities_controls .panel {
     width: 173px;
     margin: 5px;
@@ -121,9 +123,40 @@
 }
 
 .plusminus {
-
+    position: absolute;
 }
 
 .plusminus a{
     text-decoration: none;
+}
+
+.plusminus.str {
+    left: 397px;
+    top: 8px;
+}
+
+.plusminus.dex {
+    right: 210px;
+    top: 109px;
+}
+
+.plusminus.con {
+    right: 210px;
+    top: 259px;
+}
+
+.plusminus.int {
+    left: 397px;
+    bottom: 8px;
+}
+
+
+.plusminus.wis {
+    left: 206px;
+    top: 259px;
+}
+
+.plusminus.cha {
+    left: 206px;
+    top: 109px;
 }
