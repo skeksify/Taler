@@ -1,7 +1,6 @@
 /**
  * Created by Skeksify on 12/25/14.
  */
-var my_hex;
 
 function draw_hexagon() {
     var create_character_canvas = document.getElementById("hexagon");
@@ -10,6 +9,7 @@ function draw_hexagon() {
     var levels = 7;
     var distance = rad / levels;
     var cosine = Math.cos(Math.PI/6);
+    var first_settings;
     var vertices = {
         STR: function (x, y, rad) {
             return {x: x, y: y - rad};
@@ -30,7 +30,7 @@ function draw_hexagon() {
             return {x: x - rad*cosine, y: y - rad / 2};
         }
     }
-    var abilityCaptions = {
+    var ability_captions = {
         STR: {x: -15, y: -10},
         DEX: {x: 5, y: -5},
         CON: {x: 5, y: 5},
@@ -38,7 +38,6 @@ function draw_hexagon() {
         WIS: {x: -45, y: 5},
         CHA: {x: -45, y: -5}
     }
-    var firstSettings;
 
     function hex_grid(context, params) {
         var x = params.cx;
@@ -66,7 +65,7 @@ function draw_hexagon() {
                 if (!i) {
                     context.font = 'italic 16px Verdana';
                     context.fillStyle = '#eee';
-                    context.fillText(Ability, nextPoint.x + abilityCaptions[Ability].x, nextPoint.y + abilityCaptions[Ability].y);
+                    context.fillText(Ability, nextPoint.x + ability_captions[Ability].x, nextPoint.y + ability_captions[Ability].y);
                 } else if(Ability=='DEX'){
                     context.font = 'italic 14px Arial';
                     context.fillStyle = '#eee';
@@ -82,18 +81,18 @@ function draw_hexagon() {
     this.init = function (settings) {
         // Store first settings for later redraws of the grid
         if (settings) // First Init, regular
-            firstSettings = settings;
+            first_settings = settings;
         else // Not first, clear context
-            context.clearRect(0, 0, firstSettings.width, firstSettings.height);
-        hex_grid(context, {cx: firstSettings.width / 2, cy: firstSettings.height / 2}); // Rad here defines the outer hex
+            context.clearRect(0, 0, first_settings.width, first_settings.height);
+        hex_grid(context, {cx: first_settings.width / 2, cy: first_settings.height / 2}); // Rad here defines the outer hex
     }
 
-    this.draw_set = function (set) {
+    this.drawSet = function (set) {
         this.init();
         context.beginPath();
         context.strokeStyle = '#ff0';
-        var x = firstSettings.width / 2;
-        var y = firstSettings.height / 2;
+        var x = first_settings.width / 2;
+        var y = first_settings.height / 2;
         var start = {
             x: vertices.STR(x, y, (set.STR * distance) + (distance * 2)).x,
             y: vertices.STR(x, y, (set.STR * distance) + (distance * 2)).y
@@ -116,7 +115,8 @@ function draw_hexagon() {
             WIS: $('#wis_id').val(),
             CHA: $('#cha_id').val()
         }
-        this.draw_set(stats);
+        this.drawSet(stats);
+        return stats;
     }
 }
 
@@ -127,10 +127,3 @@ function getMousePos(canvas, evt) {
         y: evt.clientY - rect.top
     };
 }
-
-$(document).ready(function () {
-    my_hex = new draw_hexagon();
-
-    my_hex.init({width: 420, height: 400});
-    my_hex.drawFromCreateCharBoard();
-})

@@ -36,6 +36,10 @@
     right: 20px;
     border: 1px solid #000000;
 }
+.wizard_wrapper .next.back {
+    left: 20px;
+    width: 102px;
+ }
 
 .wizard_wrapper .list-group {
     border: 1px solid rgb(217, 140, 48);
@@ -59,6 +63,8 @@
     background-image: linear-gradient(to bottom, rgb(23, 14, 5) 0, rgb(92, 59, 19) 100%);
 }
 
+.wizard_wrapper
+
 .step .title {
     font-size: 14px;
     margin: 20px 0;
@@ -73,6 +79,17 @@
     margin: auto;
 }
 
+.alignment {
+    width: 200px;
+    margin: auto;
+}
+.list-group.alignment .list-group-item {
+    line-height: 50px;
+}
+.alignment img{
+    -webkit-filter: drop-shadow(2px 2px 1px rgba(255, 255,255, 0.2));
+    border: 0px solid white;
+}
 .list-group-item .symbol {
     float: left;
     font-size: 14px;
@@ -88,7 +105,7 @@
     cursor: default;
 }
 .abilities_controls .panel {
-    width: 173px;
+    width: 183px;
     margin: 5px;
     background: rgb(51, 51, 51);
 }
@@ -99,13 +116,38 @@
     float: right;
 }
 .abilities_controls .panel .input-group{
-    width: 160px;
+    width: 170px;
     margin: 6px;
 }
 
+.abilities_controls .panel .input-group input{
+    text-align: center;
+}
 .abilities_controls .panel .input-group .input-group-addon{
     min-width: 124px;
     text-align: left;
+}
+
+.wizard_wrapper .name-wrapper {
+    width: 400px;
+    margin: 60px auto 10px;
+}
+
+.portraits-wrapper .groups img {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.portraits-wrapper .groups img.active {
+    border: 2px groove #ffff00;
+}
+
+.portraits-wrapper .groups div {
+    display: none;
+}
+
+.portraits-wrapper .groups div.active{
+    display: inline-block;
 }
 
 .draw_hex {

@@ -9,10 +9,12 @@
                 <div class="list-group gender">
                     <a href="#" class="list-group-item" fvalue="male">
                         <div class="symbol">♀</div>
-                        Male</a>
+                        Male
+                    </a>
                     <a href="#" class="list-group-item" fvalue="female">
                         <div class="symbol">♂</div>
-                        Female</a>
+                        Female
+                    </a>
                 </div>
                 <div class="next btn">Onwards</div>
             </div>
@@ -30,29 +32,29 @@
                     <div class="panel l">
                         <div class="input-group">
                             <span class="input-group-addon">Intelligence:</span>
-                            <input id="int_id" name="int_id" class="form-control" placeholder="0" type="text" disabled>
+                            <input id="int_id" name="int" class="form-control" placeholder="0" type="text" disabled>
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">Wisdom:</span>
-                            <input id="wis_id" name="wis_id" class="form-control" placeholder="0" type="text" disabled>
+                            <input id="wis_id" name="wis" class="form-control" placeholder="0" type="text" disabled>
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">Charisma:</span>
-                            <input id="cha_id" name="cha_id" class="form-control" placeholder="0" type="text" disabled>
+                            <input id="cha_id" name="cha" class="form-control" placeholder="0" type="text" disabled>
                         </div>
                     </div>
                     <div class="panel r">
                         <div class="input-group">
                             <span class="input-group-addon">Strength:</span>
-                            <input id="str_id" name="str_id" class="form-control" placeholder="0" type="text" disabled>
+                            <input id="str_id" name="str" class="form-control" placeholder="0" type="text" disabled>
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">Dexterity:</span>
-                            <input id="dex_id" name="dex_id" class="form-control" placeholder="0" type="text" disabled>
+                            <input id="dex_id" name="dex" class="form-control" placeholder="0" type="text" disabled>
                         </div>
                         <div class="input-group">
                             <span class="input-group-addon">Constitution:</span>
-                            <input id="con_id" name="con_id" class="form-control" placeholder="0" type="text" disabled>
+                            <input id="con_id" name="con" class="form-control" placeholder="0" type="text" disabled>
                         </div>
                     </div>
                 </div>
@@ -60,11 +62,63 @@
 
                 <div id="bank_label"></div>
 
-                <div class="draw_hex btn">Draw Hexagon</div>
+                <!--div class="draw_hex btn">Draw Hexagon</div-->
+                <div class="next back btn">Backwards</div>
                 <div class="next btn">Onwards</div>
             </div>
-            <div class="step" step="3"></div>
+            <div class="step" step="3">
+                <div class="title">Alignment:</div>
+                <div class="list-group alignment">
+                    <a href="#" class="list-group-item" fvalue="good">
+                        <div class="symbol"><img src="../ri/flame_good.jpg" /></div>
+                        Good
+                    </a>
+                    <a href="#" class="list-group-item" fvalue="neutral">
+                        <div class="symbol"><img src="../ri/flame_neu.jpg" /></div>
+                        Neutral
+                    </a>
+                    <a href="#" class="list-group-item" fvalue="evil">
+                        <div class="symbol"><img src="../ri/flame_evil.jpg" /></div>
+                        Evil
+                    </a>
+                </div>
+                <div class="next back btn">Backwards</div>
+                <div class="next btn">Onwards</div>
+            </div>
 
+            <div class="step" step="4">
+                <div class="title">Portrait:</div>
+                <div class="portraits-wrapper">
+                    <div class="groups">
+                        <div class="males">
+                            <img src="../ri/portraits/m1.jpg" portrait_id="1" />
+                            <img src="../ri/portraits/m2.jpg" portrait_id="2" />
+                            <img src="../ri/portraits/m3.jpg" portrait_id="3" />
+                            <img src="../ri/portraits/m4.jpg" portrait_id="4" />
+                        </div>
+                        <div class="females">
+                            <img src="../ri/portraits/f1.jpg" portrait_id="1" />
+                            <img src="../ri/portraits/f2.jpg" portrait_id="2" />
+                            <img src="../ri/portraits/f3.jpg" portrait_id="3" />
+                            <img src="../ri/portraits/f4.jpg" portrait_id="4" />
+                        </div>
+                    </div>
+                </div>
+                <div class="next back btn">Backwards</div>
+                <div class="next btn">Onwards</div>
+            </div>
+
+            <div class="step" step="5">
+                <div class="title">Name:</div>
+                <div class="name-wrapper">
+                    <div class="input-group">
+                        <span class="input-group-addon">Character's Name:</span>
+                        <input id="name_id" name="name" class="form-control" placeholder="" type="text" />
+                    </div>
+                </div>
+                <div class="next back btn">Backwards</div>
+                <div class="next btn">Onwards</div>
+            </div>
         </fieldset>
     </form>
 </div>
