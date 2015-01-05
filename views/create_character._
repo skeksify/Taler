@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/rj/create_character.js"></script>
 <script type="text/javascript" src="/rj/hexagon.js"></script>
 <link href="/rs/create_character.css" rel="stylesheet"/>
+<input type="hidden" value="/ri/leaf.jpg" id="leaf_id" />
 <div class="wizard_wrapper">
     <form role="form">
         <fieldset>
@@ -70,15 +71,15 @@
                 <div class="title">Alignment:</div>
                 <div class="list-group alignment">
                     <a href="#" class="list-group-item" fvalue="good">
-                        <div class="symbol"><img src="../ri/flame_good.jpg" /></div>
+                        <div class="symbol"><img src="../ri/flame_good.png" /></div>
                         Good
                     </a>
                     <a href="#" class="list-group-item" fvalue="neutral">
-                        <div class="symbol"><img src="../ri/flame_neu.jpg" /></div>
+                        <div class="symbol"><img src="../ri/flame_neu.png" /></div>
                         Neutral
                     </a>
                     <a href="#" class="list-group-item" fvalue="evil">
-                        <div class="symbol"><img src="../ri/flame_evil.jpg" /></div>
+                        <div class="symbol"><img src="../ri/flame_evil.png" /></div>
                         Evil
                     </a>
                 </div>

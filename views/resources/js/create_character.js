@@ -144,7 +144,7 @@ $(document).ready(function () {
         });
     });
     // Jump to third phase:
-    if (1) {
+    if (0) {
         $('[fvalue=female]').click();
         $('[step=' + 1 + '] .next:not(.back)').click();
         setTimeout(function(){
