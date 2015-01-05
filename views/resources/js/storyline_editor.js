@@ -416,8 +416,22 @@ function redraw(who){
 }
 
 function save_playground(){
-    localStorage.setItem('playground', mj());
-    alert('Saved!\r\n\r\n\r\n\r\n'+localStorage.getItem('playground'));
+    var playground_json = mj();
+    localStorage.setItem('playground', playground_json);
+    //alert('Saved!\r\n\r\n\r\n\r\n'+localStorage.getItem('playground'));
+
+    var my_tmp_boards = {'playground': playground_json};
+    //debugger;
+
+    $.ajax({
+        type: 'post',
+        dataType: 'json',
+        url: '/json/game/save_playground',
+        data: my_tmp_boards,
+        success: function(result){
+            console.log(result)
+        }
+    });
 }
 
 function load_playground(){

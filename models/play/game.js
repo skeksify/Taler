@@ -2,26 +2,39 @@
  * Created by Skeksify on 12/11/14.
  */
 
+var conn = require("../db.js"); // DB
+
 var actions = {
     create_game:
-        function (key){
+        function (){
             var view = require("../../controllers/create_game.js"); // Controller
-            return view.get_view(key);
+            return view.get_view();
         },
 
     storyline_editor:
-        function (key){
+        function (){
             var view = require("../../controllers/storyline_editor.js"); // Controller
-            return view.get_view(key);
+            return view.get_view();
         },
 
+    save_playground: function(params){
+        if(!conn.isInit())
+            conn.init_connection();
+        var result = conn.save_playground('1', params);
+        return result;
+    },
+
     create_character:
-        function(key){
+        function(){
             var view = require("../../controllers/create_character.js"); // Controller
-            return view.get_view(key);
+            return view.get_view();
         }
 };
 
 for(var Action_Name in actions){
     exports[Action_Name] = actions[Action_Name];
+}
+
+function cl($var) {
+    console.log($var);
 }
