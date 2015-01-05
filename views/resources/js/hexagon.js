@@ -86,6 +86,25 @@ function draw_hexagon() {
             context.clearRect(0, 0, first_settings.width, first_settings.height);
         hex_grid(context, {cx: first_settings.width / 2, cy: first_settings.height / 2}); // Rad here defines the outer hex
     }
+    var img_ready = false;
+    var img_filled_once = false;
+    var imageObj = new Image();
+    imageObj.onload = function(){ img_ready = true; }
+    imageObj.src = $("#leaf_id").val();
+
+    this.getImgRdy = function() { return img_ready; }
+    function fill_shape() {
+        setTimeout(function(){
+            if(img_ready){
+                if(img_filled_once){
+                    var leaf_pattern = context.createPattern(imageObj,"no-repeat");
+                    context.fillStyle = leaf_pattern;
+                }
+                context.fill();
+            } else
+                fill_shape();
+        },100);
+    };
 
     this.drawSet = function (set) {
         this.init();
@@ -104,6 +123,9 @@ function draw_hexagon() {
         }
         context.lineTo(start.x, start.y);
         context.stroke();
+        //debugger;
+        fill_shape();
+        img_filled_once = true;
     }
 
     this.drawFromCreateCharBoard = function(){

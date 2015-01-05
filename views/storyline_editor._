@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/rj/jquery.jsPlumb-1.7.2-min.js"></script>
 <script type="text/javascript" src="/rj/storyline_editor.js"></script>
 <link href="/rs/storyline_editor.css" rel="stylesheet"/>
+<div id="floater"><div class="top-bar"><div class="title"></div> <div class="edit">Edit</div> <div class="delete">Delete</div> </div><div class="content"></div></div>
 <div class="action-box" id="action_box_id">
     <div class="top-bar">
         <div>
@@ -8,6 +9,34 @@
         </div>
     </div>
     <div class="wrappers-wrapper">
+        <div class="action-form-wrapper fw">
+            <form role="form">
+                <fieldset>
+                    <!-- Text input-->
+                    <div class="control-group">
+                        <label class="control-label" for="new_action_labelI">Label:</label>
+                        <div class="controls">
+                            <input id="new_action_labelI" type="text" placeholder="Personal Use" class="form-control" required="">
+                        </div>
+                        <br/>
+                        <div class="radios-wrapper">
+                            <label class="radio" for="actionEff-0">
+                                <input type="radio" name="new_action_effect" id="actionEff-0" value="turnOnFlag" checked="checked">
+                                Turn On Flag: <input type="text" placeholder="Flag Name" class="form-control" id="new_action_flag_nameI" />
+                            </label>
+                            <label class="radio" for="actionEff-0">
+                                <input type="radio" name="new_action_effect" id="actionEff-1" value="turnOffFlag" checked="checked">
+                                Turn Off Flag: <input type="text" placeholder="Flag Name" class="form-control" id="new_action_flag_nameII" />
+                            </label>
+                            <label class="radio" for="actionEff-1">
+                                <input type="radio" name="new_action_effect" id="actionEff-2" value="kill">
+                                Kill Char
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
         <div class="entry-form-wrapper fw">
             <form role="form">
                 <fieldset>
@@ -15,12 +44,12 @@
                     <div class="control-group">
                         <label class="control-label" for="new_entry_labelI">Label:</label>
                         <div class="controls">
-                            <input id="new_entry_labelI" type="text" placeholder="Personal Use" class="form-control" required="">
+                            <input id="new_entry_labelI" type="text" placeholder="Personal Use" class="form-control">
                         </div>
                         <br/>
                         <label class="control-label" for="new_entry_speechI">Speech:</label>
                         <div class="controls">
-                            <textarea id="new_entry_speechI" class="form-control speech" required=""></textarea>
+                            <textarea id="new_entry_speechI" class="form-control speech"></textarea>
                         </div>
                     </div>
                 </fieldset>
@@ -55,7 +84,7 @@
                         </div>
                         <br/>
                         <div class="">
-                            <label class="radio-inline" for="bType-0">
+                            <label class="radio-inline" for="actionEff-0">
                                 <input type="radio" name="new_board_type" id="bType-0" value="con" checked="checked">
                                 Conversation
                             </label>

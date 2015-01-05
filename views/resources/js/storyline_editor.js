@@ -31,7 +31,7 @@ function Entry(settings){
     };
     loadSettings(this, settings, defaults);
     forceSettings(this, { replies: [] });
-    this.onUpdate = function(){ cl('Entry Updated'); };
+    this.onUpdate = function(){ if(0) cl('Entry Updated'); };
     this.addReply = function(reply){
         if(reply instanceof Reply){
             this.replies.push(reply);
@@ -45,6 +45,8 @@ function Entry(settings){
             this.onUpdate();
         }
     }
+    this.setLabel = function(new_label){ this.entryLabel = new_label; this.onUpdate(); return this; }
+    this.setSpeech = function(new_speech){ this.entrySpeech = new_speech; this.onUpdate(); return this; }
 }
 
 function Reply(settings){
@@ -56,10 +58,14 @@ function Reply(settings){
     };
     loadSettings(this, settings, defaults);
     forceSettings(this, { leadsTo: null });
-    this.onUpdate = function(){ cl('Reply Updated'); };
+    this.onUpdate = function(){ if(0) cl('Reply Updated'); };
     this.setLeadsTo = function(leadsTo){
         switch (Object.getPrototypeOf(leadsTo)){
             case Entry.prototype:
+                this.leadsTo = leadsTo;
+                this.onUpdate();
+                break;
+            case Action.prototype:
                 this.leadsTo = leadsTo;
                 this.onUpdate();
                 break;
@@ -69,24 +75,35 @@ function Reply(settings){
     this.follow = function(){
         return this.leadsTo;
     }
+    this.setLabel = function(new_label){ this.replyLabel = new_label; this.onUpdate(); return this; }
+    this.setSpeech = function(new_speech){ this.replySpeech = new_speech; this.onUpdate(); return this; }
 }
 
 function Action(settings){
     /*
-    Action will be leadTo from Reply (Reply's label should describe the action)
+    Action will be leadTo from Reply (Reply's label/body should describe the action)
     Action will leadTo Entry
     When playing, if arriving to Action, should run actionEffect and direct to leadsTo
      */
     var defaults = {
         leadsTo: null,
+        actionLabel: '',
         actionEffect: function(){}
     };
-    loadSettings(this, settings, defaults);
-    this.onUpdate = function(){ cl('Action Updated'); };
 
+    loadSettings(this, settings, defaults);
+    this.onUpdate = function(){ if(0) cl('Action Updated'); };
+
+    this.setEffect = function(new_val_actionEffect){
+        if(isFu(new_val_actionEffect)){
+            actionEffect = new_val_actionEffect;
+            this.onUpdate();
+        }
+    }
     this.setLeadsTo = function(leadsTo){
         this.leadsTo = leadsTo;
         this.onUpdate();
+        return this.leadsTo;
     }
 }
 
@@ -111,120 +128,243 @@ function engageNewEntity(paramObject){
     var that = this; // Keeping the invoking element
     var board_id = $(that).closest('.drawing_panel').attr('boardid');
     var entityType = paramObject.data.type;
-    var entityTypeText = (entityType?'New Reply':'New Entry');
     /*
-     ToDo: Father Entity Indication
+     ToDo: Father Entity Indication (Onboard)
      Todo: Support Father Entity Change (while box open)
      */
 
-    open_dialog(entityTypeText, function(){
+    open_dialog(entityType, function(){
         var updatedEntity = null;
-        var entityToUpdate = getEntityByTriggeringElement.call(that, !entityType, board_id);
-        if(entityType){ //Reply
-            var settings = {
-                replyLabel: $('#new_reply_labelI').val(),
-                replySpeech: $('#new_reply_speechI').val()
-            };
-            updatedEntity = entityToUpdate.addReply(new Reply(settings));
-            close_dialog('"'+updatedEntity.replyLabel+'" added successfully!', redraw, board_id);
-        } else { //Entry
-            var settings = {
-                entryLabel: $('#new_entry_labelI').val(),
-                entrySpeech: $('#new_entry_speechI').val()
-            };
-            updatedEntity = entityToUpdate.setLeadsTo(new Entry(settings));
-            close_dialog('"'+updatedEntity.entryLabel+'" added successfully!', redraw, board_id);
+        var entityToUpdate = getEntityBySimplePath(makeSimplePath(that));
+        switch (entityType){ //Reply
+            case 'New Action':
+                var actionEffect;
+                switch ($('input[name=new_action_effect]:checked').val()){
+                    case 'turnOnFlag':
+                        var flag_name = $('#new_action_flag_nameI').val();
+                        actionEffect = function(character){
+                            character[flag_name] = true;
+                        }
+                        break;
+                    case 'turnOffFlag':
+                        var flag_name = $('#new_action_flag_nameII').val();
+                        actionEffect = function(character){
+                            character[flag_name] = false;
+                        }
+                        break;
+                    case 'kill':
+                        actionEffect = function(character){
+                            character.dead = true;
+                        }
+                        break;
+                }
+                var settings = {
+                    actionLabel: $('#new_action_labelI').val(),
+                    actionEffect: actionEffect
+                };
+                updatedEntity = entityToUpdate.setLeadsTo(new Action(settings));
+                close_dialog('"'+updatedEntity.actionLabel+'" added successfully!', redraw, board_id);
+                break;
+            case 'New Reply':
+                var settings = {
+                    replyLabel: $('#new_reply_labelI').val(),
+                    replySpeech: $('#new_reply_speechI').val()
+                };
+                updatedEntity = entityToUpdate.addReply(new Reply(settings));
+                close_dialog('"'+updatedEntity.replyLabel+'" added successfully!', redraw, board_id);
+                break;
+            case 'New Entry':
+                var settings = {
+                    entryLabel: $('#new_entry_labelI').val(),
+                    entrySpeech: $('#new_entry_speechI').val()
+                };
+                updatedEntity = entityToUpdate.setLeadsTo(new Entry(settings));
+                close_dialog('"'+updatedEntity.entryLabel+'" added successfully!', redraw, board_id);
+                break;
         }
     });
 }
 
-function getEntityByTriggeringElement(entityType, board_id){
-    var add_button = $(this);
-    var parent_replies = add_button.parents('[replynumber]');
+function makeSimplePath(button){
+    var key = 'breadcrumbs';
+    if(!(button instanceof jQuery))
+        button = $(button);
+    var parent_replies = button.parents('['+(key)+']');
     var parent_replies_numbers = [];
     parent_replies.each(function(){
-        var reply_number = $(this).attr('replynumber');
+        var reply_number = $(this).attr(key);
         parent_replies_numbers.push(reply_number);
     });
-    parent_replies_numbers.reverse(); // Was running in out, need path from root
-    return getEntityByPath(parent_replies_numbers, entityType, board_id);
-}
-
-function getEntityByPath(path, entityType, board_id){
-    var nextEntry, thisReply;
-    var resultEntry = boards[board_id].interactionTree;
-    if(isOb(path) && path.length && resultEntry instanceof Entry)
-        for(var i in path)
-            if((parseInt(i)+1)!=path.length || !entityType)
-                if((thisReply = resultEntry.replies[path[i]]) instanceof Reply && (nextEntry = thisReply.leadsTo) instanceof Entry)
-                    resultEntry = nextEntry;
-                else
-                    return console.error('Path error');
-    return entityType ? resultEntry.replies[path[path.length-1]] : resultEntry;
+    parent_replies_numbers.push($(button).closest('[boardid]').attr('boardid'));
+    return parent_replies_numbers.reverse(); // Was running in out, need path from root
 }
 
 
 // Recursion Steppers //
 
 function recurMakeEntry(pseuEntry){
-    var resultEntry = new Entry(pseuEntry);
-    for(var index in pseuEntry.replies){
-        var iter_pseuReply = pseuEntry.replies[index];
-        var iter_reply = new Reply(iter_pseuReply);
-        if(iter_pseuReply.leadsTo) // Continue Condition, means you haven't reached a leaf (Reply that ends the dialog)
-            iter_reply.setLeadsTo(recurMakeEntry(iter_pseuReply.leadsTo));
-        resultEntry.addReply(iter_reply);
+    var resultEntry;
+    if(typeof(pseuEntry.entryLabel)!='undefined'){
+        resultEntry = new Entry(pseuEntry)
+        for(var index in pseuEntry.replies){
+            var iter_pseuReply = pseuEntry.replies[index];
+            var iter_reply = new Reply(iter_pseuReply);
+            if(iter_pseuReply.leadsTo) // Continue Condition, means you haven't reached a leaf (Reply that ends the dialog)
+                iter_reply.setLeadsTo(recurMakeEntry(iter_pseuReply.leadsTo));
+            resultEntry.addReply(iter_reply);
+        }
+    } else { //action
+        resultEntry = new Action(pseuEntry);
+        if(resultEntry.leadsTo)
+            resultEntry.setLeadsTo(recurMakeEntry(resultEntry.leadsTo))
     }
     return resultEntry;
 }
 
 function recur_draw_entry(entry){
-    if(entry instanceof Entry){
+    if(entry instanceof Entry || entry instanceof Action){
         var resultString = [];
-        resultString.push('<div class="entry">');
-            resultString.push('<div class="replyHolder">');
-                resultString.push('<div class="entryLabel" title="'+entry.entrySpeech+'">' + entry.entryLabel + '</div>');
-            resultString.push('</div>');
-            resultString.push('<div class="replyHolder">');
-            for(var index in entry.replies){
-                var iter_reply = entry.replies[index];
-                if(iter_reply instanceof Reply){
-                    resultString.push('<div class="reply'+(iter_reply.leadsTo?' notLeaf':'')+'" replynumber="'+index+'">');
-                        resultString.push('<div class="replyHolder">');
-                            resultString.push('<div class="replyLabel'+(iter_reply.leadsTo?' notLeaf':'')+'" title="'+iter_reply.replySpeech+'">');
-                            resultString.push(iter_reply.replyLabel);
-                            if(!iter_reply.leadsTo)
-                                resultString.push('<div class="add-entry" toreplynumber="'+index+'" style="float: right">+</div>');
-                            resultString.push('</div>');
-                        resultString.push('</div>');
-                        resultString.push('<div class="replyHolder">');// Transition between answer to new Entry
-                        if(iter_reply.leadsTo) // Continue Condition
-                            resultString.push('<div class="tableBox">'+recur_draw_entry(iter_reply.leadsTo)+'</div>');
-                        resultString.push('</div>');
-                    resultString.push('</div>');
-                }
-            }
-            /* New reply */
-            resultString.push('<div class="reply">');
+        resultString.push('<div class="entry" breadcrumbs="'+((entry instanceof Action)?'$':'+')+'">');
+            if(entry instanceof Action){
                 resultString.push('<div class="replyHolder">');
-                    resultString.push('<div class="replyLabel add-reply">+</div>');
+                    resultString.push('<div class="actionLabel">');
+                        resultString.push('<div style="float: left;">' + entry.actionLabel + '</div>');
+                        if(!entry.leadsTo)
+                            resultString.push(
+                                '<div class="add-entry" style="float: right">+</div>' +
+                                '<div class="add-action" style="float: right">$</div>');
                     resultString.push('</div>');
                 resultString.push('</div>');
-            resultString.push('</div>');
-            resultString.push('<div class="clr"></div>');
+                    if(entry.leadsTo){
+                        resultString.push('<div class="replyHolder">');
+                            resultString.push('<div class="tableBox">'+recur_draw_entry(entry.leadsTo)+'</div>');
+                        resultString.push('</div>');
+                    }
+            }
+            else{
+                resultString.push('<div class="replyHolder">');
+                    resultString.push('<div class="entryLabel" title="'+entry.entrySpeech+'">' + entry.entryLabel + '</div>');
+                resultString.push('</div>');//Inner Reply Holder
+                resultString.push('<div class="replyHolder">');
+                    for(var index in entry.replies){
+                        var iter_reply = entry.replies[index];
+                        if(iter_reply instanceof Reply){
+                            resultString.push('<div class="reply'+(iter_reply.leadsTo?' notLeaf':'')+'" breadcrumbs="'+index+'">');
+                                resultString.push('<div class="replyHolder">');
+                                    resultString.push('<div class="replyLabel'+(iter_reply.leadsTo?' notLeaf':'')+'" title="'+iter_reply.replySpeech+'">');
+                                    resultString.push(iter_reply.replyLabel);
+                                    if(!iter_reply.leadsTo)
+                                        resultString.push(
+                                            '<div class="add-entry" style="float: right">+</div>' +
+                                            '<div class="add-action" style="float: right">$</div>');
+                                    resultString.push('</div>');
+                                resultString.push('</div>');
+                                resultString.push('<div class="replyHolder">');// Transition between answer to new Entry
+                                if(iter_reply.leadsTo) // Continue Condition
+                                    resultString.push('<div class="tableBox">'+recur_draw_entry(iter_reply.leadsTo)+'</div>');
+                                resultString.push('</div>');
+                            resultString.push('</div>');
+                        }
+                    }
+                    /* New reply, only on Entries */
+                    resultString.push('<div class="reply">');
+                        resultString.push('<div class="replyHolder">');
+                            resultString.push('<div class="replyLabel add-reply">+</div>');
+                        resultString.push('</div>');
+                    resultString.push('</div>');
+
+                resultString.push('</div>');//Outer Reply Holder
+                resultString.push('<div class="clr"></div>');
+            }
         resultString.push('</div>');
-        return resultString.join('\r\n');
+        return resultString.join('');
     }
 }
 
+function getEntityBySimplePath(path){
+    var board = boards[path.splice(0,1)[0]];
+    var resultEntity = board.interactionTree;
+    if(path.splice(0,1)[0]=='+') //If begins with entry (And take it out)
+        for(var key in path)
+            if(isNaN(path[key])) //Entry/Action
+                resultEntity = resultEntity.leadsTo;
+            else //Reply
+                resultEntity = resultEntity.replies[path[key]];
+    return resultEntity;
+}
 
 // Playground Functions //
 
 function setPlaygroundBindings(){
     $('#action_box_id .bottom-bar .cancel').click(close_dialog);
 
-    $('#playground .add-entry').click({type: 0}, engageNewEntity);
-    $('#playground .add-reply').click({type: 1}, engageNewEntity);
+    $('#playground .add-entry').click({type: 'New Entry'}, engageNewEntity);
+    $('#playground .add-reply').click({type: 'New Reply'}, engageNewEntity);
+    $('#playground .add-action').click({type: 'New Action'}, engageNewEntity);
+
+    var all_labels = $('#playground .actionLabel, #playground .replyLabel:not(.add-reply), #playground .entryLabel');
+    all_labels.on('contextmenu', function(ev){
+        var triggerer = $(ev.target).closest('.actionLabel, .replyLabel, .entryLabel');
+        var simple_path = makeSimplePath(triggerer);
+        var entity = getEntityBySimplePath(simple_path);
+        var entity_type = entity.constructor.name;
+        var triggerer_pos = triggerer.position();
+        var height = parseInt(triggerer.css('height'));
+        var width = parseInt(triggerer.css('width'));//ev.clientX
+        all_labels.removeClass('active_label');
+        triggerer.addClass('active_label');
+        var dialog_title, label, speech, window_markup = [], editF, deleteF;
+        switch (entity_type){
+            case "Action":
+                editF = null;
+                label = entity.actionLabel;
+                window_markup.push(entity.actionEffect.toString());
+                break;
+            case "Entry":
+                dialog_title = 'Edit Entry';
+                label = entity.entryLabel;
+                speech = entity.entrySpeech;
+                window_markup.push('Entry Chosen<br/><br/>Speech:<br/>'+speech);
+                var input_label = $('#new_entry_labelI');
+                var ta_speech = $('#new_entry_speechI');
+                input_label.val(label);
+                ta_speech.val(speech);
+                editF = function(){
+                    entity.setLabel(input_label.val());
+                    entity.setSpeech(ta_speech.val())
+                    close_dialog('"'+entity.entryLabel+'" updated successfully!', redraw, simple_path[0]);
+                }
+                break;
+            case "Reply":
+                dialog_title = 'Edit Reply';
+                label = entity.replyLabel;
+                speech = entity.replySpeech;
+                var input_label = $('#new_reply_labelI');
+                var ta_speech = $('#new_reply_speechI');
+                input_label.val(label);
+                ta_speech.val(speech);
+                editF = function(){
+                    debugger;
+                    entity.setLabel(input_label.val());
+                    entity.setSpeech(ta_speech.val())
+                    close_dialog('"'+entity.replyLabel+'" updated successfully!', redraw, simple_path[0]);
+                };
+                window_markup.push('Reply Chosen<br/><br/>Speech:<br/>'+speech);
+                break;
+        }
+        var floater = $('#floater');
+        floater.css('top', triggerer_pos.top+height).css('left', triggerer_pos.left+width).show();
+        floater.find('.edit').unbind();
+        if(isFu(editF))
+            floater.find('.edit').click(function(){
+                open_dialog(dialog_title, editF);
+                floater.hide();
+            });
+        floater.find('.content').html(window_markup.join(''));
+        floater.find('.title').html(entity_type);
+        ev.preventDefault()
+    })
+
 }
 
 function recompilePlayground(PlaygroundJSON){
@@ -246,15 +386,17 @@ function redraw(who){
         var playground = $('#playground .boards').html('');
         var navBar = $('.loaded-boards-nav-list').html('');
         var markup = [];
+        var dd;
         var navBarMarkup = [];
         for(var i in boards){
             markup.push('<div class="panel drawing_panel" boardid="'+i+'">');
                 markup.push('<div class="board-title">');
                     markup.push(boards[i].boardTitle);
                 markup.push('</div>');
-            markup.push('<div class="panel-body drawing_board">');
-            markup.push(recur_draw_entry(boards[i].interactionTree));
-            markup.push('</div>');
+                markup.push('<div class="panel-body drawing_board">');
+                    dd = (recur_draw_entry(boards[i].interactionTree));
+                    markup.push(dd);
+                markup.push('</div>');
             markup.push('</div>');
             navBarMarkup.push('<li><a href="#">'+boards[i].title+'</a></li>');
         }
@@ -295,23 +437,26 @@ function load_playground(){
 function open_dialog(dialog, okFunction){
     set_action_box_ok(okFunction);
     var dialogs = {
+        'New Action': 'action-form-wrapper',
         'New Entry': 'entry-form-wrapper',
         'New Reply': 'reply-form-wrapper',
-        'New Board': 'board-form-wrapper'
+        'New Board': 'board-form-wrapper',
+        'Edit Entry': 'entry-form-wrapper',
+        'Edit Reply': 'reply-form-wrapper'
     };
     var box_div = $('#action_box_id');
     var form_wrapper_div = $('.'+dialogs[dialog], box_div);
     var bottom_bar_div = $('.bottom-bar', box_div);
     var cancel_div = $('.bottom-bar .cancel', box_div);
-    $('#action_box_id .title').html('Add '+dialog);
-    if(1 || !box_div.is(":visible")){
-        form_wrapper_div.hide(); bottom_bar_div.show(); cancel_div.show().css('opacity',1);
-        box_div.fadeIn(Tmed, function(){
-            form_wrapper_div.slideDown(600, function(){
-                //bottom_bar_div.fadeIn(Tmed);
-            });
+    $('#action_box_id .title').html(dialog);
+    $('.action-box .top-bar').html('<div>'+dialog+'</div>');
+    form_wrapper_div.hide(); bottom_bar_div.show(); cancel_div.show().css('opacity',1);
+    box_div.fadeIn(Tmed, function(){
+        $('.wrappers-wrapper>div').fadeOut();
+        form_wrapper_div.slideDown(600, function(){
+            //bottom_bar_div.fadeIn(Tmed);
         });
-    }
+    });
 }
 
 function close_dialog(msg, cb, cbparams){
@@ -354,8 +499,15 @@ function set_action_box_ok(func){
 function isUn(o){ return typeof (o)=='undefined'; }
 function isSt(o){ return typeof (o)=='string'; }
 function isOb(o){ return typeof (o)=='object'; }
+function isFu(o){ return typeof (o)=='function'; }
 function mj(){ return JSON.stringify(boards); }
 function cl(c){ console.log(c) };
+
+// Prototype Utils //
+//Object.prototype.isAction = function(){ return this instanceof Action }
+//Object.prototype.isEntry = function(){ return this instanceof Entry }
+//Object.prototype.isReply = function(){ return this instanceof Reply}
+
 
 
 // Document Ready
@@ -369,10 +521,11 @@ $(document).ready(function(){
             };
             var tmpNewBoard = new Board(settings);
             tmpNewBoard.setFirstEntry(new Entry({entryLabel: 'First Entry!'}));
-            var new_board_id = boards.push(tmpNewBoard);
+            //var new_board_id = boards.push(tmpNewBoard);
             close_dialog('New Board Added!', redraw());
         });
 
     });
     load_playground(); //Try
+
 });
