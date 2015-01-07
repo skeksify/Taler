@@ -26,21 +26,17 @@ exports.isInit = function(){ return initialized }
 
 exports.init_connection = init_connection;
 
-exports.save_playground = function(user, playground) {
-    cl('coming to save playground to '+user);
+exports.save_playground = function(user, playground, callback) {
     var new_to_store = {
         'owner': user,
         'playground[]': JSON.parse(playground.playground)
     };
-    cl('-------------------------------');
-    cl(new_to_store);
-    cl('-------------------------------');
+    cl('Preparing to save');
     var myPlayground = new playgroundModel(new_to_store);
-    myPlayground.save(function (err, saved_playground) {
+    return myPlayground.save(function (err, saved_playground) {
         if (err) {console.error(err); return {success: false}}
         else cl('Saved!');
-
-        return {success: true, view: 'a'+saved_playground._id};
+        callback({success: true, view: saved_playground._id});
         //saved_playground should be == params?
     });
 }

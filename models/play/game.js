@@ -17,11 +17,10 @@ var actions = {
             return view.get_view();
         },
 
-    save_playground: function(params){
+    save_playground: function(params, callback){
         if(!conn.isInit())
             conn.init_connection();
-        var result = conn.save_playground('1', params);
-        return result;
+        conn.save_playground('1', params, callback);
     },
 
     create_character:

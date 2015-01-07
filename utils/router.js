@@ -32,7 +32,8 @@ var regex_cases = {
                 if (json.actions.inArray(params[2])) {
                     return {
                         type: 'json',
-                        path:  json.path
+                        path:  json.path,
+                        asynch: true
                     }
                 } else { cl('Action (' + params[2] + ') not allowed') }
             } else { cl('Model (' + params[1] + ') not allowed') }
@@ -78,7 +79,7 @@ var regex_cases = {
     }
 }
 
-function get_action(path, params) {
+function get_action(path, params, callback) {
     var pathName = url.parse(path).pathname;
     var queryName = url.parse(path).query;
 
@@ -90,16 +91,22 @@ function get_action(path, params) {
                     return { success: true, type: 'resource', path: direction.path, cType: direction.cType };
                 } else {
                     var modelObj = require(direction.path);
+                    cl(modelObj);
                     if (typeof(return_function = modelObj[result[2]]) == 'function') {
                         // Return the result of the end function, with the proper arguments sent
-                        var result = return_function(params);
-                        return { success: true, type: direction.type, view: result };
+                        if(direction.asynch){
+                            return_function(params, callback);
+                        } else {
+                            var fun_result = return_function(params);
+                            return { success: true, type: direction.type, view: fun_result };
+                        }
                     } else {
                         console.error("Allowed action not implemented" + result[2] + "|||");
                         return { success: false, error: 13};
                     }
                 }
             }
+            break; // Once found, enough
         }
     }
     return { success: false, error: 11};
