@@ -88,6 +88,7 @@ function Action(settings){
     var defaults = {
         leadsTo: null,
         actionLabel: '',
+        actionType: '',
         actionEffect: function(){}
     };
 
@@ -100,6 +101,13 @@ function Action(settings){
             this.onUpdate();
         }
     }
+
+    this.setPath = function(new_val_path){
+        this.path = new_val_path;
+    }
+
+    this.getPath = function(){ return this.path; }
+
     this.setLeadsTo = function(leadsTo){
         this.leadsTo = leadsTo;
         this.onUpdate();
@@ -138,21 +146,31 @@ function engageNewEntity(paramObject){
         var entityToUpdate = getEntityBySimplePath(makeSimplePath(that));
         switch (entityType){ //Reply
             case 'New Action':
-                var actionEffect;
+                var actionEffect, actionType, path;
                 switch ($('input[name=new_action_effect]:checked').val()){
+                    case 'redirect':
+                        actionType = 'redirect';
+                        path = $('#target_entry_path').val();
+                        actionEffect = function(character){
+                            character.redirect(path);
+                        }
+                        break;
                     case 'turnOnFlag':
+                        actionType = 'charmod';
                         var flag_name = $('#new_action_flag_nameI').val();
                         actionEffect = function(character){
                             character[flag_name] = true;
                         }
                         break;
                     case 'turnOffFlag':
+                        actionType = 'charmod';
                         var flag_name = $('#new_action_flag_nameII').val();
                         actionEffect = function(character){
                             character[flag_name] = false;
                         }
                         break;
                     case 'kill':
+                        actionType = 'charmod';
                         actionEffect = function(character){
                             character.dead = true;
                         }
@@ -160,9 +178,12 @@ function engageNewEntity(paramObject){
                 }
                 var settings = {
                     actionLabel: $('#new_action_labelI').val(),
-                    actionEffect: actionEffect
+                    actionEffect: actionEffect,
+                    actionType: actionType
                 };
                 updatedEntity = entityToUpdate.setLeadsTo(new Action(settings));
+                if(actionType=='redirect')
+                    updatedEntity.setPath(path);
                 close_dialog('"'+updatedEntity.actionLabel+'" added successfully!', redraw, board_id);
                 break;
             case 'New Reply':
@@ -215,6 +236,8 @@ function recurMakeEntry(pseuEntry){
         }
     } else { //action
         resultEntry = new Action(pseuEntry);
+        if(pseuEntry.path)
+            resultEntry.setPath(pseuEntry.path);
         if(resultEntry.leadsTo)
             resultEntry.setLeadsTo(recurMakeEntry(resultEntry.leadsTo))
     }
@@ -298,12 +321,29 @@ function getEntityBySimplePath(path){
 function setPlaygroundBindings(){
     $('#action_box_id .bottom-bar .cancel').click(close_dialog);
 
+    $('#TargetEntryButton').click(function(){
+        var pather = $('#target_entry_path');
+        var that = this;
+        if(pather.val()){
+            pather.val('');
+            $(that).html('Target Entry');
+        } else {
+            $(that).html('Select Target');
+            $('.drawing_board .entryLabel').addClass('pickable').unbind().click(function(){
+                pather.val(makeSimplePath(this).toString());
+                $(that).html('Path Selected');
+                $('.drawing_board .entryLabel').removeClass('pickable').unbind();
+                $(this).addClass('pickable');
+            });
+        }
+    });
     $('#playground .add-entry').click({type: 'New Entry'}, engageNewEntity);
     $('#playground .add-reply').click({type: 'New Reply'}, engageNewEntity);
     $('#playground .add-action').click({type: 'New Action'}, engageNewEntity);
 
     var all_labels = $('#playground .actionLabel, #playground .replyLabel:not(.add-reply), #playground .entryLabel');
     all_labels.on('contextmenu', function(ev){
+        close_dialog();
         var triggerer = $(ev.target).closest('.actionLabel, .replyLabel, .entryLabel');
         var simple_path = makeSimplePath(triggerer);
         var entity = getEntityBySimplePath(simple_path);
@@ -353,7 +393,7 @@ function setPlaygroundBindings(){
                 break;
         }
         var floater = $('#floater');
-        floater.css('top', triggerer_pos.top+height).css('left', triggerer_pos.left+width).show();
+        floater.css('top', triggerer_pos.top+height-5).css('left', triggerer_pos.left+width-5).show();
         floater.find('.edit').unbind();
         if(isFu(editF))
             floater.find('.edit').click(function(){

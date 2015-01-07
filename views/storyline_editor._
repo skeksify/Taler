@@ -20,15 +20,20 @@
                         </div>
                         <br/>
                         <div class="radios-wrapper">
+                            <label class="radio" for="actionEff-3">
+                                <input type="radio" name="new_action_effect" id="actionEff-3" value="redirect" checked="checked">
+                                Redirect: <div class="btn" id="TargetEntryButton">Target Entry</div>
+                                <input type="hidden" id="target_entry_path" value="" />
+                            </label>
                             <label class="radio" for="actionEff-0">
-                                <input type="radio" name="new_action_effect" id="actionEff-0" value="turnOnFlag" checked="checked">
+                                <input type="radio" name="new_action_effect" id="actionEff-0" value="turnOnFlag">
                                 Turn On Flag: <input type="text" placeholder="Flag Name" class="form-control" id="new_action_flag_nameI" />
                             </label>
-                            <label class="radio" for="actionEff-0">
-                                <input type="radio" name="new_action_effect" id="actionEff-1" value="turnOffFlag" checked="checked">
+                            <label class="radio" for="actionEff-1">
+                                <input type="radio" name="new_action_effect" id="actionEff-1" value="turnOffFlag">
                                 Turn Off Flag: <input type="text" placeholder="Flag Name" class="form-control" id="new_action_flag_nameII" />
                             </label>
-                            <label class="radio" for="actionEff-1">
+                            <label class="radio" for="actionEff-2">
                                 <input type="radio" name="new_action_effect" id="actionEff-2" value="kill">
                                 Kill Char
                             </label>
