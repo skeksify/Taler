@@ -74,6 +74,11 @@
                         <div class="controls">
                             <textarea id="new_reply_speechI" class="form-control speech" required=""></textarea>
                         </div>
+                        <br/>
+                        <label class="control-label" for="new_reply_condI">Condition:</label>
+                        <div class="controls">
+                            <textarea id="new_reply_condI" class="form-control " required=""></textarea>
+                        </div>
                     </div>
                 </fieldset>
             </form>

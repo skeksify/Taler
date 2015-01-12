@@ -54,6 +54,7 @@ function Reply(settings){
         replyLabel: '',
         replySpeech: '',
         replyType: '',
+        replyCondition: '',
         leadsTo: null
     };
     loadSettings(this, settings, defaults);
@@ -77,6 +78,7 @@ function Reply(settings){
     }
     this.setLabel = function(new_label){ this.replyLabel = new_label; this.onUpdate(); return this; }
     this.setSpeech = function(new_speech){ this.replySpeech = new_speech; this.onUpdate(); return this; }
+    this.setCondition = function(new_condition){ this.replyCondition = new_condition; this.onUpdate(); return this; }
 }
 
 function Action(settings){
@@ -103,10 +105,10 @@ function Action(settings){
     }
 
     this.setPath = function(new_val_path){
-        this.path = new_val_path;
+        this.redirectPath = new_val_path;
     }
 
-    this.getPath = function(){ return this.path; }
+    this.getPath = function(){ return this.redirectPath; }
 
     this.setLeadsTo = function(leadsTo){
         this.leadsTo = leadsTo;
@@ -189,7 +191,8 @@ function engageNewEntity(paramObject){
             case 'New Reply':
                 var settings = {
                     replyLabel: $('#new_reply_labelI').val(),
-                    replySpeech: $('#new_reply_speechI').val()
+                    replySpeech: $('#new_reply_speechI').val(),
+                    replyCondition: $('#new_reply_condI').val()
                 };
                 updatedEntity = entityToUpdate.addReply(new Reply(settings));
                 close_dialog('"'+updatedEntity.replyLabel+'" added successfully!', redraw, board_id);
@@ -236,8 +239,8 @@ function recurMakeEntry(pseuEntry){
         }
     } else { //action
         resultEntry = new Action(pseuEntry);
-        if(pseuEntry.path)
-            resultEntry.setPath(pseuEntry.path);
+        if(pseuEntry.redirectPath)
+            resultEntry.setPath(pseuEntry.redirectPath);
         if(resultEntry.leadsTo)
             resultEntry.setLeadsTo(recurMakeEntry(resultEntry.leadsTo))
     }
@@ -250,7 +253,7 @@ function recur_draw_entry(entry){
         resultString.push('<div class="entry" breadcrumbs="'+((entry instanceof Action)?'$':'+')+'">');
             if(entry instanceof Action){
                 resultString.push('<div class="replyHolder">');
-                    resultString.push('<div class="actionLabel">');
+                    resultString.push('<div class="actionLabel'+(entry.actionType=='redirect'?' redirect':'')+'">');
                         resultString.push('<div style="float: left;">' + entry.actionLabel + '</div>');
                         if(!entry.leadsTo)
                             resultString.push(
@@ -266,7 +269,7 @@ function recur_draw_entry(entry){
             }
             else{
                 resultString.push('<div class="replyHolder">');
-                    resultString.push('<div class="entryLabel" title="'+entry.entrySpeech+'">' + entry.entryLabel + '</div>');
+                    resultString.push('<div class="entryLabel">' + entry.entryLabel + '</div>');
                 resultString.push('</div>');//Inner Reply Holder
                 resultString.push('<div class="replyHolder">');
                     for(var index in entry.replies){
@@ -274,7 +277,7 @@ function recur_draw_entry(entry){
                         if(iter_reply instanceof Reply){
                             resultString.push('<div class="reply'+(iter_reply.leadsTo?' notLeaf':'')+'" breadcrumbs="'+index+'">');
                                 resultString.push('<div class="replyHolder">');
-                                    resultString.push('<div class="replyLabel'+(iter_reply.leadsTo?' notLeaf':'')+'" title="'+iter_reply.replySpeech+'">');
+                                    resultString.push('<div class="replyLabel'+(iter_reply.leadsTo?' notLeaf':'')+(iter_reply.replyCondition?' conditional':'')+'">');
                                     resultString.push(iter_reply.replyLabel);
                                     if(!iter_reply.leadsTo)
                                         resultString.push(
@@ -287,7 +290,7 @@ function recur_draw_entry(entry){
                                     resultString.push('<div class="tableBox">'+recur_draw_entry(iter_reply.leadsTo)+'</div>');
                                 resultString.push('</div>');
                             resultString.push('</div>');
-                        }
+                        } else console.log('Data Structure Invalid');
                     }
                     /* New reply, only on Entries */
                     resultString.push('<div class="reply">');
@@ -295,7 +298,7 @@ function recur_draw_entry(entry){
                             resultString.push('<div class="replyLabel add-reply">+</div>');
                         resultString.push('</div>');
                     resultString.push('</div>');
-
+                    /* -New reply, only on Entries */
                 resultString.push('</div>');//Outer Reply Holder
                 resultString.push('<div class="clr"></div>');
             }
@@ -315,7 +318,12 @@ function getEntityBySimplePath(path){
                 resultEntity = resultEntity.replies[path[key]];
     return resultEntity;
 }
-
+function getElementBySimplePath(path){
+    var result = $("[boardid="+(path.splice(0,1)[0])+"]>.drawing_board");
+    for(var i in path)
+        result = result.closestDescendant('[breadcrumbs="'+path[i]+'"]');
+    return result;
+}
 // Playground Functions //
 
 function setPlaygroundBindings(){
@@ -344,7 +352,9 @@ function setPlaygroundBindings(){
     var all_labels = $('#playground .actionLabel, #playground .replyLabel:not(.add-reply), #playground .entryLabel');
     all_labels.on('contextmenu', function(ev){
         close_dialog();
+        blur_context();
         var triggerer = $(ev.target).closest('.actionLabel, .replyLabel, .entryLabel');
+        var floater = $('#floater');
         var simple_path = makeSimplePath(triggerer);
         var entity = getEntityBySimplePath(simple_path);
         var entity_type = entity.constructor.name;
@@ -353,18 +363,22 @@ function setPlaygroundBindings(){
         var width = parseInt(triggerer.css('width'));//ev.clientX
         all_labels.removeClass('active_label');
         triggerer.addClass('active_label');
-        var dialog_title, label, speech, window_markup = [], editF, deleteF;
+        var dialog_title, label, speech, cond, window_markup = [], editF, deleteF;
         switch (entity_type){
             case "Action":
                 editF = null;
                 label = entity.actionLabel;
-                window_markup.push(entity.actionEffect.toString());
+                window_markup.push('<div class="code">'+entity.actionEffect.toString()+'</div>');
+                if(path = entity.getPath()){
+                    var element = getElementBySimplePath(path.split(','));
+                    element.children().first().find('.entryLabel').addClass('pickable');
+                }
                 break;
             case "Entry":
                 dialog_title = 'Edit Entry';
                 label = entity.entryLabel;
-                speech = entity.entrySpeech;
-                window_markup.push('Entry Chosen<br/><br/>Speech:<br/>'+speech);
+                speech = htmlEscape(entity.entrySpeech);
+                window_markup.push('Speech:<br/>'+speech);
                 var input_label = $('#new_entry_labelI');
                 var ta_speech = $('#new_entry_speechI');
                 input_label.val(label);
@@ -378,33 +392,41 @@ function setPlaygroundBindings(){
             case "Reply":
                 dialog_title = 'Edit Reply';
                 label = entity.replyLabel;
-                speech = entity.replySpeech;
+                speech = htmlEscape(entity.replySpeech);
+                cond = entity.replyCondition;
+                window_markup.push((cond?('Condition:<br/><div class="code">'+cond+'</div><br/>'):'')+'Speech:<br/>'+speech);
                 var input_label = $('#new_reply_labelI');
                 var ta_speech = $('#new_reply_speechI');
+                var ta_cond = $('#new_reply_condI');
                 input_label.val(label);
                 ta_speech.val(speech);
+                if(cond)
+                    ta_cond.val(cond);
                 editF = function(){
-                    debugger;
                     entity.setLabel(input_label.val());
-                    entity.setSpeech(ta_speech.val())
+                    entity.setSpeech(ta_speech.val());
+                    entity.setCondition(ta_cond.val());
                     close_dialog('"'+entity.replyLabel+'" updated successfully!', redraw, simple_path[0]);
                 };
-                window_markup.push('Reply Chosen<br/><br/>Speech:<br/>'+speech);
                 break;
         }
-        var floater = $('#floater');
-        floater.css('top', triggerer_pos.top+height-5).css('left', triggerer_pos.left+width-5).show();
+        floater.hide().css('top', triggerer_pos.top+height-5).css('left', triggerer_pos.left+width-5).fadeIn(100);
         floater.find('.edit').unbind();
         if(isFu(editF))
             floater.find('.edit').click(function(){
                 open_dialog(dialog_title, editF);
-                floater.hide();
+                blur_context();
             });
         floater.find('.content').html(window_markup.join(''));
         floater.find('.title').html(entity_type);
         ev.preventDefault()
-    })
+    });
+}
 
+function blur_context(){
+    $('.pickable').removeClass('pickable');
+    $('#floater').fadeOut(50);
+    $('.active_label').removeClass('active_label');
 }
 
 function recompilePlayground(PlaygroundJSON){
@@ -422,6 +444,7 @@ function recompilePlayground(PlaygroundJSON){
 }
 
 function redraw(who){
+    $('#floater').hide();
     if(isUn(who)){ // All
         var playground = $('#playground .boards').html('');
         var navBar = $('.loaded-boards-nav-list').html('');
@@ -582,4 +605,34 @@ $(document).ready(function(){
     });
     load_playground(); //Try
 
+    $('body').click(function(event){
+        if(!$('#floater').find(event.target).length)
+            blur_context();
+    });
 });
+
+
+/*!
+ * BFS!
+ * .closestDescendant( selector [, findAll ] )
+ * https://github.com/tlindig/jquery-closest-descendant
+ *
+ * v0.1.2 - 2014-02-17
+ *
+ * Copyright (c) 2014 Tobias Lindig
+ * http://tlindig.de/
+ *
+ * License: MIT
+ *
+ * Author: Tobias Lindig <dev@tlindig.de>
+ */
+!function(a){a.fn.closestDescendant=function(b,c){if(!b||""===b)return a();c=c?!0:!1;var d=a();return this.each(function(){var e=a(this),f=[];for(f.push(e);f.length>0;)for(var g=f.shift(),h=g.children(),i=0;i<h.length;++i){var j=a(h[i]);if(j.is(b)){if(d.push(j[0]),!c)return!1}else f.push(j)}}),d}}(jQuery);
+
+function htmlEscape(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}

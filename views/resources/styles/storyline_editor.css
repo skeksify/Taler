@@ -133,6 +133,10 @@ textarea.form-control.speech {
     cursor: pointer;
 }
 
+.drawing_board .actionLabel.redirect{
+    border-style: dotted;
+}
+
 .drawing_board .entryLabel{
     padding: 5px;
     border: 1px solid rgb(156, 173, 255);
@@ -160,6 +164,9 @@ textarea.form-control.speech {
     border-right: 0;
 }
 
+.drawing_board .replyLabel.conditional{
+    text-decoration: underline;
+}
 .drawing_board .replyAction.notLeaf{
     border-right: 0;
 }
@@ -238,3 +245,6 @@ textarea.form-control.speech {
     padding: 10px;
 }
 
+div.code {
+    font-family: consolas;
+}
