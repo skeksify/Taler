@@ -1,0 +1,49 @@
+
+doctype html
+html(lang='en')
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        meta(name='description', content='Taler - Create your own game!')
+        meta(name='author', content='Ben Haram')
+        script(type='text/javascript', src='/rj/jquery-2.1.1.min.js')
+        // script type="text/javascript" src="/rj/underscore-min.js"></script
+        script(type='text/javascript', src='/rj/bootstrap.min.js')
+        script(type='text/javascript', src='/rj/jquery.animate-shadow-min.js')
+        script(type='text/javascript', src='/rj/master-scripts.js')
+        link(href='/rs/bootstrap.min.css', rel='stylesheet')
+        link(href='/rs/bootstrap-theme.min.css', rel='stylesheet')
+        link(href='/rs/extra_styles1.css', rel='stylesheet')
+        title
+            ='Taler'+(page_title?' - '+page_title:'')
+    body(role='document')
+        .main_wrapper
+            // Fixed navbar
+            nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
+                .container
+                    #navbar.navbar-collapse
+                        ul.nav.navbar-nav
+                            li(class=(page=='home'?'active':''))
+                                a(href='/') Home
+                            if loggedin
+                                li(class=(page=='create_character'?'active':''))
+                                    a(href='/game/create_character') Create Character
+                                li(class=(page=='storyline_editor'?'active':''))
+                                    a(href='/game/storyline_editor') Create Game
+                                li.dropdown
+                                    a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-expanded='false')
+                                        | Loaded Boards
+                                        span.caret
+                                    ul.dropdown-menu.loaded-boards-nav-list(role='menu')
+                                        li.dropdown-header Nav header
+                                        li
+                                            a(href='#') Separated link
+                                        li
+                                            a(href='#') One more separated link
+                                li
+                                    a(href='#loaded', onclick='redraw()') Redraw
+                            li.login
+                                include ./login.jade
+            block content
+            block scripts

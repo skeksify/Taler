@@ -1,0 +1,116 @@
+
+extends layout
+block content
+  link(href='/rs/create_character.css', rel='stylesheet')
+  input#leaf_id(type='hidden', value='/ri/leaf.jpg')
+  .wizard_wrapper
+    form(role='form')
+      fieldset
+        .step.active(step='1')
+          .title Gender:
+          .list-group.gender
+            a.list-group-item(href='#', fvalue='male')
+              .symbol ♀
+              |                         Male
+            a.list-group-item(href='#', fvalue='female')
+              .symbol ♂
+              |                         Female
+          .next.btn Onwards
+        .step(step='2')
+          .title
+            | Abilities:
+          .abilities_controls
+            .plusminus.str
+              a(href='#', ability='str', modifier='1') +
+              |  / 
+              a(ability='str', modifier='-1', href='#') -
+            .plusminus.dex
+              a(href='#', ability='dex', modifier='1') +
+              |  / 
+              a(ability='dex', modifier='-1', href='#') -
+            .plusminus.con
+              a(href='#', ability='con', modifier='1') +
+              |  / 
+              a(ability='con', modifier='-1', href='#') -
+            .plusminus.int
+              a(href='#', ability='int', modifier='1') +
+              |  / 
+              a(ability='int', modifier='-1', href='#') -
+            .plusminus.wis
+              a(href='#', ability='wis', modifier='1') +
+              |  / 
+              a(ability='wis', modifier='-1', href='#') -
+            .plusminus.cha
+              a(href='#', ability='cha', modifier='1') +
+              |  / 
+              a(ability='cha', modifier='-1', href='#') -
+            .panel.l
+              .input-group
+                span.input-group-addon Intelligence:
+                input#int_id.form-control(name='int', placeholder='0', type='text', disabled='')
+              .input-group
+                span.input-group-addon Wisdom:
+                input#wis_id.form-control(name='wis', placeholder='0', type='text', disabled='')
+              .input-group
+                span.input-group-addon Charisma:
+                input#cha_id.form-control(name='cha', placeholder='0', type='text', disabled='')
+            .panel.r
+              .input-group
+                span.input-group-addon Strength:
+                input#str_id.form-control(name='str', placeholder='0', type='text', disabled='')
+              .input-group
+                span.input-group-addon Dexterity:
+                input#dex_id.form-control(name='dex', placeholder='0', type='text', disabled='')
+              .input-group
+                span.input-group-addon Constitution:
+                input#con_id.form-control(name='con', placeholder='0', type='text', disabled='')
+          canvas#hexagon(width='420', height='400')
+          #bank_label
+          // div class="draw_hex btn">Draw Hexagon</div
+          .next.back.btn Backwards
+          .next.btn Onwards
+        .step(step='3')
+          .title Alignment:
+          .list-group.alignment
+            a.list-group-item(href='#', fvalue='good')
+              .symbol
+                img(src='../ri/flame_good.png')
+              |                         Good
+            a.list-group-item(href='#', fvalue='neutral')
+              .symbol
+                img(src='../ri/flame_neu.png')
+              |                         Neutral
+            a.list-group-item(href='#', fvalue='evil')
+              .symbol
+                img(src='../ri/flame_evil.png')
+              |                         Evil
+          .next.back.btn Backwards
+          .next.btn Onwards
+        .step(step='4')
+          .title Portrait:
+          .portraits-wrapper
+            .groups
+              .males
+                img(src='../ri/portraits/m1.jpg', portrait_id='1')
+                img(src='../ri/portraits/m2.jpg', portrait_id='2')
+                img(src='../ri/portraits/m3.jpg', portrait_id='3')
+                img(src='../ri/portraits/m4.jpg', portrait_id='4')
+              .females
+                img(src='../ri/portraits/f1.jpg', portrait_id='1')
+                img(src='../ri/portraits/f2.jpg', portrait_id='2')
+                img(src='../ri/portraits/f3.jpg', portrait_id='3')
+                img(src='../ri/portraits/f4.jpg', portrait_id='4')
+          .next.back.btn Backwards
+          .next.btn Onwards
+        .step(step='5')
+          .title Name:
+          .name-wrapper
+            .input-group
+              span.input-group-addon Character's Name:
+              input#name_id.form-control(name='name', placeholder='', type='text')
+          .next.back.btn Backwards
+          .next.btn Onwards
+  .canvas_holder
+block scripts
+  script(type='text/javascript', src='/rj/create_character.js')
+  script(type='text/javascript', src='/rj/hexagon.js')

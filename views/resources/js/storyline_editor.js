@@ -326,6 +326,27 @@ function getElementBySimplePath(path){
 }
 // Playground Functions //
 
+var run_flashes = false;
+var onof = true;
+
+function toggleLight(element){
+    console.log('runnin');
+    var settings;
+    if(onof){
+        onof = false;
+        settings = {boxShadow: '0 0 16px #ff3'};
+    } else {
+        onof = true;
+        settings = {boxShadow: '0 0 2px #ff3'};
+    }
+    if(run_flashes)
+        element.animate(settings, 500, function(){
+            toggleLight(element);
+        });
+    else
+        element.animate({boxShadow: '0 0 0 #000'}, 500, function(){/*run_flashes=false*/});
+}
+
 function setPlaygroundBindings(){
     $('#action_box_id .bottom-bar .cancel').click(close_dialog);
 
@@ -368,10 +389,12 @@ function setPlaygroundBindings(){
             case "Action":
                 editF = null;
                 label = entity.actionLabel;
-                window_markup.push('<div class="code">'+entity.actionEffect.toString()+'</div>');
+                window_markup.push(entity.actionEffect.toString());
                 if(path = entity.getPath()){
                     var element = getElementBySimplePath(path.split(','));
-                    element.children().first().find('.entryLabel').addClass('pickable');
+                    var playable = element.children().first().find('.entryLabel');//.addClass('pickable');
+                    run_flashes = true;
+                    toggleLight(playable);
                 }
                 break;
             case "Entry":
@@ -424,9 +447,12 @@ function setPlaygroundBindings(){
 }
 
 function blur_context(){
-    $('.pickable').removeClass('pickable');
-    $('#floater').fadeOut(50);
-    $('.active_label').removeClass('active_label');
+    if($('.active_label').length){
+        $('.pickable').removeClass('pickable');
+        $('#floater').fadeOut(50);
+        $('.active_label').removeClass('active_label');
+        run_flashes = false;
+    }
 }
 
 function recompilePlayground(PlaygroundJSON){
@@ -598,8 +624,8 @@ $(document).ready(function(){
             };
             var tmpNewBoard = new Board(settings);
             tmpNewBoard.setFirstEntry(new Entry({entryLabel: 'First Entry!'}));
-            //var new_board_id = boards.push(tmpNewBoard);
-            close_dialog('New Board Added!', redraw());
+            var new_board_id = boards.push(tmpNewBoard);
+            close_dialog('New Board Added!', redraw);
         });
 
     });

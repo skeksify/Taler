@@ -1,4 +1,6 @@
-
+a {
+    cursor: pointer;
+}
 body {
     background: #222;
     color: rgb(239, 244, 229);
@@ -28,4 +30,41 @@ body {
 
 .clr {
     clear: both;
+}
+.login_wrapper {
+    line-height: 50px;
+}
+.login_wrapper a {
+    vertical-align: middle;
+}
+
+.login_wrapper div {
+    display: inline-block;
+}
+.login_wrapper input[type=text], .login_wrapper input[type=password] {
+    width: 120px;
+    line-height: 18px;
+    font-size: 11px;
+    font-family: consolas;
+    padding: 0 5px;
+    border-radius: 4px;
+    color: rgb(0, 0, 0);
+}
+
+.login_wrapper input[type=checkbox] {
+    margin: 0 10px;
+    vertical-align: middle;
+}
+
+.nav.navbar-nav {
+    width: 100%;
+}
+
+#navbar li.login {
+    float: right;
+}
+
+#navbar .loggedin{
+    vertical-align: middle;
+    line-height: 50px;
 }

@@ -1,0 +1,12 @@
+if loggedin
+    .loggedin
+        | Hi #{luser.user}!
+else
+    .login_wrapper
+        div
+            input(type="text" placeholder="Username")#loginun
+        div
+            input(type="password" placeholder="Password")#loginps
+        div
+            input(type="checkbox", checked='checked')#loginrm
+        a#fire_login Login

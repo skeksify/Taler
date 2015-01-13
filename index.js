@@ -1,16 +1,44 @@
 /**
- * Created by Skeksify on 12/8/14 07:51.
+ * Created by Skeksify on 1/12/15.
  */
 
-Array.prototype.inArray = function(str){
-    return this.indexOf(str)>-1;
+
+var express = require('express');
+var http = require('http');
+var app = express();
+//var cons = require('consolidate'); // For Underscore, maybe later go Jade?
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var bodyParser = require('body-parser');
+
+app.set('port', 8080);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'jade');
+
+if (app.get('env') === 'development') {
+    app.locals.pretty = true;
 }
+//	app.use(express.favicon());
+//	app.use(express.logger('dev'));
 
-var global_models = {
-    router: require("./utils/router.js"),
-    server: require("./models/server.js"),
-    dbconn: require("./models/db.js")
-};
+//app.use(bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+}));
+app.use(cookieParser());
+app.use(session({secret: 'Teleki', resave: false, saveUninitialized: true}));
+//////app.use(express.methodOverride());
+//////app.use(require('stylus').middleware({ src: __dirname + '/app/public' }));
+app.use('/rj', express.static(__dirname + '/views/resources/js'));
+app.use('/ri', express.static(__dirname + '/views/resources/images'));
+app.use('/rs', express.static(__dirname + '/views/resources/styles'));
 
-global_models.server.init_server(global_models.router.get_action)
+/*app.configure('development', function(){
+    app.use(express.errorHandler());
+});*/
 
+require('./controllers/router')(app);
+
+http.createServer(app).listen(app.get('port'), function(){
+    console.log("Express server listening on port " + app.get('port'));
+})

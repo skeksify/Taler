@@ -91,7 +91,7 @@ function draw_hexagon() {
     var imageObj = new Image();
     imageObj.onload = function(){ img_ready = true; }
     imageObj.src = $("#leaf_id").val();
-
+if(0){
     this.getImgRdy = function() { return img_ready; }
     function fill_shape() {
         setTimeout(function(){
@@ -105,7 +105,7 @@ function draw_hexagon() {
                 fill_shape();
         },100);
     };
-
+}
     this.drawSet = function (set) {
         this.init();
         context.beginPath();

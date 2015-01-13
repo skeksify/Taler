@@ -143,6 +143,7 @@ textarea.form-control.speech {
     font-style: italic;
     margin-right: 10px;
     cursor: pointer;
+    -webkit-box-shadow: 0 0 0 rgb(0, 0, 0);
 }
 
 .drawing_board .entryLabel.pickable{
