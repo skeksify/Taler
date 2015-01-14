@@ -2,30 +2,83 @@
 var crypto 		= require('crypto');
 var MongoDB 	= require('mongodb').Db;
 var Server 		= require('mongodb').Server;
+var oId         = require('mongodb').ObjectID;
 var moment 		= require('moment');
-//mongodb://<dbuser>:<dbpassword>@ds053139.mongolab.com:53139/taler
-var dbPort 		= 53139;
-var dbHost 		= 'ds053139.mongolab.com';
-var dbName 		= 'taler';
 
-/* establish the database connection 1318006befbc58fd8611725822895b28 */
+var auth = true;
+if(1) {
+    var dbPort 		= 53139;
+    var dbHost 		= 'ds053139.mongolab.com';
+    var dbName 		= 'taler';
+} else {
+    var dbPort 		= 27017;
+    var dbHost 		= 'localhost';
+    var dbName 		= 'Taler';
+}
+
+/* establish the database connection */
 
 var db = new MongoDB(dbName, new Server(dbHost, dbPort, {auto_reconnect: true}), {w: 1});
+
 db.open(function(e, d){
 	if (e) {
 		console.log(e);
 	}	else{
         // Authenticate
-        db.authenticate('skeksify', '1318006befbc58fd8611725822895b28', function(err, result) {
-            if(err)
-                console.log(err);
-            else
-                console.log('Connected to database :: ' + dbName + ' on ' + dbHost);
-        });
+        if(auth)
+            db.authenticate('skeksify', '1318006befbc58fd8611725822895b28', function(err, result) {
+                if(err)
+                    console.log(err);
+                else
+                    console.log('Connected to database :: ' + dbName + ' on ' + dbHost);
+            });
+        else
+            console.log('Connected to database :: ' + dbName + ' on ' + dbHost);
 	}
 });
-var accounts = db.collection('accounts');
 
+var accounts = db.collection('accounts');
+var games = db.collection('games');
+
+exports.saveGame = function(data, callback){
+    games.findOne({owner: data.owner, _id: oId(data._id)}, function(e, res) {
+        if(e)
+            callback(e)
+        else{
+            res.playgrounds = JSON.parse(data.playgrounds);
+            games.save(res, {safe: true}, function(err){
+                if (err)
+                    callback(err);
+                else
+                    callback(null, res);
+            });
+        }
+    });
+};
+
+exports.getGame = function(data, callback){
+    games.findOne({owner: data.owner, _id: oId(data._id)}, function(e, res) {
+        if(e)
+            callback(e)
+        else
+            callback(null, res);
+    });
+}
+
+exports.getGames = function(user_id, callback){
+    games.find({owner: user_id}).toArray(
+        function(e, res) {
+            if(e)
+                callback(e)
+            else
+                callback(null, res);
+        });
+}
+
+exports.createNewGame = function(new_game, callback){
+    new_game.date = moment().format('MMMM Do YYYY, h:mm:ss a');
+    games.insert(new_game, {safe: true}, callback);
+}
 
 exports.autoLogin = function(user, pass, callback){
     accounts.findOne({user:user}, function(e, o) {
@@ -36,8 +89,8 @@ exports.autoLogin = function(user, pass, callback){
     });
 }
 
-
 exports.manualLogin = function(user, pass, callback){
+    console.log(accounts.find().toArray(function(a,b){console.log(a)}));
     accounts.findOne({user:user}, function(e, o) {
         if (o == null){
             callback('user-not-found');

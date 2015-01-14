@@ -30,7 +30,7 @@ html(lang='en')
                                 li(class=(page=='create_character'?'active':''))
                                     a(href='/game/create_character') Create Character
                                 li(class=(page=='storyline_editor'?'active':''))
-                                    a(href='/game/storyline_editor') Create Game
+                                    a(href='/make/my-games') My Games
                                 li.dropdown
                                     a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-expanded='false')
                                         | Loaded Boards
@@ -45,5 +45,6 @@ html(lang='en')
                                     a(href='#loaded', onclick='redraw()') Redraw
                             li.login
                                 include ./login.jade
+            include ./action_box.jade
             block content
-            block scripts
+block scripts

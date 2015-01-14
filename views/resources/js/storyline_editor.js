@@ -4,10 +4,26 @@
 
 // Globals //
 
-var Tmed = 500;
-var boards = [];
-
+var playgrounds = [];
+var key = 'breadcrumbs';
 // Entities: //
+
+function Playground(settings){
+    var defaults = {
+        playgroundTitle: '',
+        playgroundBoards: []
+    };
+    loadSettings(this, settings, defaults);
+    forceSettings(this, { playgroundBoards: [] });
+    this.addBoard = function(new_board){
+        return this.playgroundBoards.push(new_board);
+    }
+    this.updateBoard = function(i, board){
+        this.playgroundBoards[i] = board;
+    }
+    this.getBoards = function(){return this.playgroundBoards }
+    this.getBoard = function(i){return this.playgroundBoards[i] }
+}
 
 function Board(settings){
     var defaults = {
@@ -18,8 +34,8 @@ function Board(settings){
     };
     loadSettings(this, settings, defaults);
     forceSettings(this, { interactionTree: null });
-    this.setFirstEntry = function(newEntry){
-        return this.interactionTree = newEntry;
+    this.setFirstEntry = function(new_entry){
+        return this.interactionTree = new_entry;
     }
 }
 
@@ -136,11 +152,11 @@ function forceSettings(instance, settings){
 
 function engageNewEntity(paramObject){
     var that = this; // Keeping the invoking element
-    var board_id = $(that).closest('.drawing_panel').attr('boardid');
+    var board_id = $(that).closest('.drawing_panel').attr(key);
     var entityType = paramObject.data.type;
     /*
      ToDo: Father Entity Indication (Onboard)
-     Todo: Support Father Entity Change (while box open)
+     Todo: Support Father Entity Change (while box open), not sure
      */
 
     open_dialog(entityType, function(){
@@ -210,7 +226,6 @@ function engageNewEntity(paramObject){
 }
 
 function makeSimplePath(button){
-    var key = 'breadcrumbs';
     if(!(button instanceof jQuery))
         button = $(button);
     var parent_replies = button.parents('['+(key)+']');
@@ -219,7 +234,7 @@ function makeSimplePath(button){
         var reply_number = $(this).attr(key);
         parent_replies_numbers.push(reply_number);
     });
-    parent_replies_numbers.push($(button).closest('[boardid]').attr('boardid'));
+    //parent_replies_numbers.push($(button).closest('.drawing_panel['+key+']').attr('boardid')); //No need? ////......./////?
     return parent_replies_numbers.reverse(); // Was running in out, need path from root
 }
 
@@ -308,7 +323,8 @@ function recur_draw_entry(entry){
 }
 
 function getEntityBySimplePath(path){
-    var board = boards[path.splice(0,1)[0]];
+    var firsTwo = path.splice(0,2);
+    var board = playgrounds[firsTwo[0]].getBoard(firsTwo[1]);
     var resultEntity = board.interactionTree;
     if(path.splice(0,1)[0]=='+') //If begins with entry (And take it out)
         for(var key in path)
@@ -319,7 +335,8 @@ function getEntityBySimplePath(path){
     return resultEntity;
 }
 function getElementBySimplePath(path){
-    var result = $("[boardid="+(path.splice(0,1)[0])+"]>.drawing_board");
+    var firsTwo = path.splice(0,2);
+    var result = $('.drawing_panel['+key+'='+firsTwo[1]+"]>.drawing_board", $('.playground['+key+'='+firsTwo[0]+']'));
     for(var i in path)
         result = result.closestDescendant('[breadcrumbs="'+path[i]+'"]');
     return result;
@@ -348,8 +365,9 @@ function toggleLight(element){
 }
 
 function setPlaygroundBindings(){
-    $('#action_box_id .bottom-bar .cancel').click(close_dialog);
 
+    resetTabs();
+    makeTabs();
     $('#TargetEntryButton').click(function(){
         var pather = $('#target_entry_path');
         var that = this;
@@ -366,11 +384,27 @@ function setPlaygroundBindings(){
             });
         }
     });
-    $('#playground .add-entry').click({type: 'New Entry'}, engageNewEntity);
-    $('#playground .add-reply').click({type: 'New Reply'}, engageNewEntity);
-    $('#playground .add-action').click({type: 'New Action'}, engageNewEntity);
 
-    var all_labels = $('#playground .actionLabel, #playground .replyLabel:not(.add-reply), #playground .entryLabel');
+    $('.playgrounds .add-entry').click({type: 'New Entry'}, engageNewEntity);
+    $('.playgrounds .add-reply').click({type: 'New Reply'}, engageNewEntity);
+    $('.playgrounds .add-action').click({type: 'New Action'}, engageNewEntity);
+
+    $('.newboard').unbind().click(function(){
+        var playground_id = $(this).parent().attr(key);
+        open_dialog('New Board', function(){
+            var settings = {
+                boardTitle: $('#new_board_titleI').val(),
+                boardType: $('input[name=new_board_type]:checked').val(),
+                boardDesc: $('#new_board_descI').val()
+            };
+            var tmpNewBoard = new Board(settings);
+            tmpNewBoard.setFirstEntry(new Entry({entryLabel: 'First Entry! (Right click to edit)'}));
+            playgrounds[playground_id].addBoard(tmpNewBoard);
+            close_dialog('New Board Added!', redraw);
+        });
+    });
+
+    var all_labels = $('.playgrounds .actionLabel, .playgrounds .replyLabel:not(.add-reply), .playgrounds .entryLabel');
     all_labels.on('contextmenu', function(ev){
         close_dialog();
         blur_context();
@@ -444,6 +478,8 @@ function setPlaygroundBindings(){
         floater.find('.title').html(entity_type);
         ev.preventDefault()
     });
+
+
 }
 
 function blur_context(){
@@ -455,45 +491,62 @@ function blur_context(){
     }
 }
 
-function recompilePlayground(PlaygroundJSON){
-    var pseuPlayground;
-    if(isSt(PlaygroundJSON))
-        pseuPlayground = JSON.parse(PlaygroundJSON);
-    else if (isOb(PlaygroundJSON))
-        pseuPlayground = PlaygroundJSON;
-    boards = [];
-    for(var i in pseuPlayground){
-        var tmpBoard = new Board(pseuPlayground[i]);
-        tmpBoard.setFirstEntry(recurMakeEntry(pseuPlayground[i].interactionTree)); //Init Recursion
-        boards.push(tmpBoard);
+function recompilePlaygrounds(PlaygroundsJSON){
+    var pseuPlaygrounds;
+    if(isSt(PlaygroundsJSON))
+        pseuPlaygrounds = JSON.parse(PlaygroundsJSON);
+    else if (isOb(PlaygroundsJSON))
+        pseuPlaygrounds = PlaygroundsJSON;
+    playgrounds = [];
+    var tmpPlayground, tmpBoard;
+    for(var i in pseuPlaygrounds){
+        tmpPlayground = new Playground(pseuPlaygrounds[i]);
+        for(var b in boards = pseuPlaygrounds[i].playgroundBoards){
+            tmpBoard = new Board(boards[b]);
+            tmpBoard.setFirstEntry(recurMakeEntry(boards[b].interactionTree)); //Init Recursion
+            tmpPlayground.addBoard(tmpBoard);
+        }
+        playgrounds.push(tmpPlayground);
     }
 }
 
 function redraw(who){
     $('#floater').hide();
-    if(isUn(who)){ // All
-        var playground = $('#playground .boards').html('');
+    if(1 || isUn(who)){ // All //For now
+        var game = $('.playgrounds').html('');
         var navBar = $('.loaded-boards-nav-list').html('');
+        var tabs_element = $('#tabs').html('');
         var markup = [];
+        var tabs = [];
         var dd;
-        var navBarMarkup = [];
-        for(var i in boards){
-            markup.push('<div class="panel drawing_panel" boardid="'+i+'">');
-                markup.push('<div class="board-title">');
-                    markup.push(boards[i].boardTitle);
+        var navBarMarkup = [];;
+        for(var i in playgrounds){
+            tabs.push('<li><a href="#playground_'+i+'" tab_number="'+i+'">'+playgrounds[i].playgroundTitle+'</a></li>');
+            markup.push('<div class="playground" '+key+'="'+i+'">');
+                markup.push('<div class="boards">');
+                    for(var b in boards = playgrounds[i].getBoards()){
+                        markup.push('<div class="panel drawing_panel" '+key+'="'+b+'">');
+                            markup.push('<div class="board-title">');
+                                markup.push(boards[b].boardTitle);
+                            markup.push('</div>');
+                            markup.push('<div class="panel-body drawing_board">');
+                                dd = recur_draw_entry(boards[b].interactionTree);
+                                markup.push(dd);
+                            markup.push('</div>');
+                        markup.push('</div>');
+                        navBarMarkup.push('<li><a href="#">'+boards[b].title+'</a></li>');
+                    }
                 markup.push('</div>');
-                markup.push('<div class="panel-body drawing_board">');
-                    dd = (recur_draw_entry(boards[i].interactionTree));
-                    markup.push(dd);
-                markup.push('</div>');
+                markup.push('<input class="btn btn-add-board newboard" type="button" value="New Board" style="margin-top: 20px" />');
             markup.push('</div>');
-            navBarMarkup.push('<li><a href="#">'+boards[i].title+'</a></li>');
         }
-        playground.append(markup.join(''));
+        tabs.push('<li><a href="#" onclick="new_playground()">+</a></li>');
+        tabs_element.html(tabs.join(''))
+        game.append(markup.join(''));
         navBar.append(navBarMarkup.join(''));
         setPlaygroundBindings();
     } else { // One board
-        var dr_p = $('.drawing_panel[boardid='+who+']');
+        var dr_p = $('.drawing_panel['+key+'='+who+']');
         var dr_b = $('.drawing_board', dr_p); //lol dr. p
         dr_p.fadeOut(Tmed, function(){
             dr_b.html(recur_draw_entry(boards[who].interactionTree));
@@ -504,107 +557,39 @@ function redraw(who){
     }
 }
 
-function save_playground(){
-    var playground_json = mj();
-    localStorage.setItem('playground', playground_json);
-    //alert('Saved!\r\n\r\n\r\n\r\n'+localStorage.getItem('playground'));
-
-    var my_tmp_boards = {'playground': playground_json};
-    //debugger;
-
+function save_game(){
+    var playgrounds_json = mjs();
+    var my_tmp_boards = { game_id: game_id, playgrounds: playgrounds_json};
     $.ajax({
         type: 'post',
         dataType: 'json',
-        url: '/json/game/save_playground',
+        url: '/make/save_game',
         data: my_tmp_boards,
         success: function(result){
-            console.log(result)
+            if(result.success)
+                alert('Saved!');
+            else
+                alert(result.error);
         }
     });
 }
-
+/*
 function load_playground(){
     if(1 || confirm('Are you sure you want to load?')){
         var loadedPlayground = localStorage.getItem('playground');
         var playgroundObj = JSON.parse(loadedPlayground);
         if(isOb(playgroundObj)){
-            recompilePlayground(playgroundObj);
+            recompilePlaygrounds(playgroundObj);
             redraw();
         }
     }
 }
-
+*/
 
 // Interactions //
 
-function open_dialog(dialog, okFunction){
-    set_action_box_ok(okFunction);
-    var dialogs = {
-        'New Action': 'action-form-wrapper',
-        'New Entry': 'entry-form-wrapper',
-        'New Reply': 'reply-form-wrapper',
-        'New Board': 'board-form-wrapper',
-        'Edit Entry': 'entry-form-wrapper',
-        'Edit Reply': 'reply-form-wrapper'
-    };
-    var box_div = $('#action_box_id');
-    var form_wrapper_div = $('.'+dialogs[dialog], box_div);
-    var bottom_bar_div = $('.bottom-bar', box_div);
-    var cancel_div = $('.bottom-bar .cancel', box_div);
-    $('#action_box_id .title').html(dialog);
-    $('.action-box .top-bar').html('<div>'+dialog+'</div>');
-    form_wrapper_div.hide(); bottom_bar_div.show(); cancel_div.show().css('opacity',1);
-    box_div.fadeIn(Tmed, function(){
-        $('.wrappers-wrapper>div').fadeOut();
-        form_wrapper_div.slideDown(600, function(){
-            //bottom_bar_div.fadeIn(Tmed);
-        });
-    });
-}
-
-function close_dialog(msg, cb, cbparams){
-    var box_div = $('#action_box_id');
-    var cont_div = $('.fw:visible', box_div);
-    var msg_div = $('.msg', box_div);
-    var cancel_div = $('.bottom-bar .cancel', box_div);
-    if(box_div.is(":visible")){
-        $('#action_box_id input, #action_box_id textarea').val('');
-        if(msg && isSt(msg)){
-            msg_div.hide();
-            cancel_div.animate({opacity: 0}, 200, 'linear');
-            cont_div.slideUp(Tmed, function(){
-                msg_div.html(msg);
-                msg_div.slideDown(Tmed, function(){
-                    setTimeout(function(){
-                        msg_div.slideUp(Tmed, function(){
-                            box_div.fadeOut(Tmed);
-                        });
-                        if(typeof(cb)=='function')
-                            cb(cbparams);
-                    }, 1500);
-                });
-            });
-        } else {
-            cont_div.slideUp(Tmed, function(){
-                box_div.fadeOut(Tmed);
-            });
-        }
-    }
-}
-
-function set_action_box_ok(func){
-    $('#action_box_id .ok').unbind().click(func);
-}
 
 
-// Utils //
-
-function isUn(o){ return typeof (o)=='undefined'; }
-function isSt(o){ return typeof (o)=='string'; }
-function isOb(o){ return typeof (o)=='object'; }
-function isFu(o){ return typeof (o)=='function'; }
-function mj(){ return JSON.stringify(boards); }
-function cl(c){ console.log(c) };
 
 // Prototype Utils //
 //Object.prototype.isAction = function(){ return this instanceof Action }
@@ -612,30 +597,107 @@ function cl(c){ console.log(c) };
 //Object.prototype.isReply = function(){ return this instanceof Reply}
 
 
+function new_playground(){
+    open_dialog('New Playground', function(){
+        var settings = {
+            playgroundTitle: $('#new_playground_titleI').val()
+        };
+        var tmpNewPlayground = new Playground(settings);
+        var new_playground_id = playgrounds.push(tmpNewPlayground);
+        close_dialog('New Playground Added!', function(){
+            window.location = ('#playground_'+(new_playground_id-1));
+            redraw();
+        });
+    });
+}
 
 // Document Ready
 $(document).ready(function(){
-    $('.btn-add-board').click(function(){
-        open_dialog('New Board', function(){
-            var settings = {
-                boardTitle: $('#new_board_titleI').val(),
-                boardType: $('input[name=new_board_type]:checked').val(),
-                boardDesc: $('#new_board_descI').val()
-            };
-            var tmpNewBoard = new Board(settings);
-            tmpNewBoard.setFirstEntry(new Entry({entryLabel: 'First Entry!'}));
-            var new_board_id = boards.push(tmpNewBoard);
-            close_dialog('New Board Added!', redraw);
-        });
+    resetTabs();
+    makeTabs();
 
+    // don't - load_playground(); //Try
+
+    $('#savealll').click(function(){
+        save_game();
     });
-    load_playground(); //Try
 
     $('body').click(function(event){
         if(!$('#floater').find(event.target).length)
             blur_context();
     });
 });
+
+
+
+
+
+
+
+
+
+
+function resetTabs(){
+    $(".playground").hide(); //Hide all content
+    $("#tabs a").removeClass('atab'); //Reset id's
+}
+
+var myUrl, myUrlTab, myUrlTabName;
+
+function makeTabs(){
+    myUrl = window.location.href; //get URL
+    myUrlTab = myUrl.substring(myUrl.indexOf("#")); // For mywebsite.com/tabs.html#tab2, myUrlTab = #tab2
+    myUrlTabName = myUrlTab.substring(0,12); // For the above example, myUrlTabName = #tab
+    $(".playground").hide(); // Initially hide all content
+
+    $("#tabs a[tab_number]").on("click",function(e) {
+        //e.preventDefault();
+        if ($(this).hasClass('atab')){ //detection for current tab
+            return
+        }
+        else{
+            resetTabs();
+            $(this).addClass('atab'); // Activate this
+            var tn = $(this).attr('tab_number');
+            $('.playground['+key+'='+tn+']').fadeIn(); // Show content for current tab
+        }
+    });
+
+    if(myUrlTab.substr(0,12)=='#playground_'){
+        resetTabs();
+        var i = myUrlTab.substr(12);
+        $("a[tab_number='"+i+"']").addClass('atab'); // Activate url tab
+        $('.playground['+key+'='+i+']').fadeIn(); // Show url tab content
+    } else {
+        $("#tabs li:first a").addClass('atab'); // Activate first tab
+        $(".playground:first").fadeIn(); // Show first tab content
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*!
