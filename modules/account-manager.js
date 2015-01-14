@@ -16,7 +16,7 @@ db.open(function(e, d){
 		console.log(e);
 	}	else{
         // Authenticate
-        db.authenticate('skeksify', '1318006befbc58fd8611725822895b28z', function(err, result) {
+        db.authenticate('skeksify', '1318006befbc58fd8611725822895b28', function(err, result) {
             if(err)
                 console.log(err);
             else
