@@ -13,7 +13,7 @@ $(document).ready(function(){
                 $.ajax({
                     type: 'post',
                     dataType: 'json',
-                    url: '/game/create_game',
+                    url: '/make/create_game',
                     data: settings,
                     success: function(result){
                         if(result.success) {
