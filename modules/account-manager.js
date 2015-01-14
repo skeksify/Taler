@@ -3,19 +3,25 @@ var crypto 		= require('crypto');
 var MongoDB 	= require('mongodb').Db;
 var Server 		= require('mongodb').Server;
 var moment 		= require('moment');
+//mongodb://<dbuser>:<dbpassword>@ds053139.mongolab.com:53139/taler
+var dbPort 		= 53139;
+var dbHost 		= 'ds053139.mongolab.com';
+var dbName 		= 'taler';
 
-var dbPort 		= 27017;
-var dbHost 		= 'localhost';
-var dbName 		= 'Taler';
-
-/* establish the database connection */
+/* establish the database connection 1318006befbc58fd8611725822895b28 */
 
 var db = new MongoDB(dbName, new Server(dbHost, dbPort, {auto_reconnect: true}), {w: 1});
 db.open(function(e, d){
 	if (e) {
 		console.log(e);
 	}	else{
-		console.log('connected to database :: ' + dbName);
+        // Authenticate
+        db.authenticate('skeksify', '1318006befbc58fd8611725822895b28', function(err, result) {
+            if(err)
+                console.log(err);
+            else
+                console.log('Connected to database :: ' + dbName + ' on ' + dbHost);
+        });
 	}
 });
 var accounts = db.collection('accounts');
