@@ -2,7 +2,7 @@
 var CT = require('./modules/country-list');
 var EM = require('./modules/email-dispatcher');
 */
-var AM;// = require('../modules/account-manager');
+var AM = require('../modules/account-manager');
 var multer = require('multer');
 var file_upload_done = false;
 
