@@ -3,13 +3,14 @@ extends layout
 block content
     script
         != ('var game_id = "'+game._id+'";')
-    if game.playgrounds
-        script
-            | $(document).ready(function(){
-            != ('recompilePlaygrounds('+JSON.stringify(game.playgrounds)+'); redraw();')
-            | });
+        | $(document).ready(function(){
+        if game.playgrounds
+            != ('recompilePlaygrounds('+JSON.stringify(game.playgrounds)+');')
+        | redraw();
+        | });
     link(href='/rs/storyline_editor.css', rel='stylesheet')
-    = game.title
+    .game_title
+        = game.title
     #floater
         .top-bar
             .title
@@ -19,7 +20,6 @@ block content
     .game
         ul#tabs
         .playgrounds
-        input.btn.btn-add-board(type='button', value='New Playground', style='margin-top: 20px')#newplayground
         input.btn.btn-add-board(type='button', value='SAVE', style='margin-top: 20px')#savealll
 block scripts
   script(type='text/javascript', src='/rj/jquery.jsPlumb-1.7.2-min.js')

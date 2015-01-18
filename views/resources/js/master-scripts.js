@@ -95,7 +95,7 @@ function close_dialog(msg, cb, cbparams){
     var msg_div = $('.msg', box_div);
     var cont_div = $('.fw:visible', box_div);
     if(box_div.is(":visible")){
-        $('#action_box_id input, #action_box_id textarea').val('');
+        $('#action_box_id input:not([type=radio]), #action_box_id textarea').val('');
         if(msg && isSt(msg)){
             show_msg(msg, function(){
                 setTimeout(function(){

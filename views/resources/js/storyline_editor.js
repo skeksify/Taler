@@ -270,7 +270,7 @@ function recur_draw_entry(entry){
                 resultString.push('<div class="replyHolder">');
                     resultString.push('<div class="actionLabel'+(entry.actionType=='redirect'?' redirect':'')+'">');
                         resultString.push('<div style="float: left;">' + entry.actionLabel + '</div>');
-                        if(!entry.leadsTo)
+                        if(!entry.leadsTo && entry.actionType!='redirect')
                             resultString.push(
                                 '<div class="add-entry" style="float: right">+</div>' +
                                 '<div class="add-action" style="float: right">$</div>');

@@ -89,14 +89,19 @@
                         div
                             label.radio-inline(for='actionEff-0')
                                 input#bType-0(type='radio', name='new_board_type', value='con', checked='checked')
-                                |                                                                 Conversation
+                                | Conversation
                             label.radio-inline(for='bType-1')
                                 input#bType-1(type='radio', name='new_board_type', value='area')
-                                |                                                                 Area
+                                | Area
                         br
                         label.control-label(for='new_board_descI') Description:
                         .controls
                             textarea#new_board_descI.form-control.speech(required='')
+                        input#board_image(type='hidden', value='')
+                        .pick-image
+                            .btn Image
+
+
     .msg.fw
     .clr
     .bottom-bar.

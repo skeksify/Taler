@@ -6,6 +6,9 @@
 var express = require('express');
 var http = require('http');
 var app = express();
+
+
+
 //var cons = require('consolidate'); // For Underscore, maybe later go Jade?
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
@@ -31,6 +34,7 @@ app.use(session({secret: 'Teleki', resave: false, saveUninitialized: true}));
 //////app.use(require('stylus').middleware({ src: __dirname + '/app/public' }));
 app.use('/rj', express.static(__dirname + '/views/resources/js'));
 app.use('/ri', express.static(__dirname + '/views/resources/images'));
+app.use('/riu', express.static(__dirname + '/views/resources/images/uploads'));
 app.use('/rs', express.static(__dirname + '/views/resources/styles'));
 
 /*app.configure('development', function(){

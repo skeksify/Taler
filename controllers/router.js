@@ -2,7 +2,9 @@
 var CT = require('./modules/country-list');
 var EM = require('./modules/email-dispatcher');
 */
-var AM = require('../modules/account-manager');
+var AM;// = require('../modules/account-manager');
+var multer = require('multer');
+var file_upload_done = false;
 
 var add_flavors = function(o, req){
     var obj = o;
@@ -35,7 +37,14 @@ module.exports = function(app) {
         }
     });
 
+    app.post( '/upload', function(req, res){
+        if(file_upload_done)
+            if(req.files)
+                res.json({success: true, file: req.files.name});
+    });
+
     app.get( '/home', function(req, res){
+        console.log(req.files);
         res.render('home', add_flavors({
             page: 'home',
             page_title: 'Home'
@@ -45,7 +54,7 @@ module.exports = function(app) {
     app.get(/^\/make\/([\w\d]{24})$/, function(req, res){
         if(logged(req))
             AM.getGame({owner: req.session.user._id, _id: req.params[0]}, function(e, o){
-                if(!e)
+                if(!e && o)
                     res.render('storyline_editor', add_flavors({
                         page: 'storyline_editor',
                         page_title: 'Edit Game',
@@ -79,7 +88,10 @@ module.exports = function(app) {
                 else
                     res.json({ success: true });
             });
+        else //Not Logged
+            res.json({ success: false, error: 'not-logged-in'});
     });
+
     app.post('/make/create_game', function(req, res){
         if(logged(req)){
             console.log(req.session.user);
@@ -102,7 +114,7 @@ module.exports = function(app) {
         AM.manualLogin(req.param('username'), req.param('password'), function(e, o){
             if (!o){
                 res.json({success: false, error: e});
-            }	else{
+            } else {
                 req.session.user = o;
                 if (req.param('rm') == 'true'){
                     res.cookie('user', o.user, { maxAge: 900000 });
@@ -115,8 +127,10 @@ module.exports = function(app) {
 
     app.post('/users/logout', function(req, res){
         req.session.destroy();
+        req.session = null;
         res.redirect('/home');
     });
+
     app.get( '/users/signup', function(req, res){
         if(logged(req))
             res.redirect('/home')
@@ -141,23 +155,17 @@ module.exports = function(app) {
     });
 
     app.get( '/game/create_character', function(req, res){
-        res.render('create_character', add_flavors({
-            page: 'create_character',
-            page_title: 'Create Character'
-        }, req));
+        if(logged(req))
+            res.render('create_character', add_flavors({
+                page: 'create_character',
+                page_title: 'Create Character'
+            }, req));
+        else //Not Logged
+            res.redirect('/home');
     });
-
-//    app.get( '/make/storyline_editor', function(req, res){
-//        res.render('storyline_editor', add_flavors({
-//            page: 'storyline_editor',
-//            page_title: 'Storyline Editor'
-//        }, req));
-//    });
 
     app.post(/^\/json\/(.+)\/(.+)$/ , function(req, res){
         var paramies = req.params;
-        //console.log(paramies);
-        //console.log(req.body);
         switch(paramies[0]){
             case 'game':
                 if(paramies[1]=='save_playground'){
@@ -177,4 +185,18 @@ module.exports = function(app) {
         });
     });
 
+    app.use(multer({
+        dest: './views/resources/images/uploads/',
+        /*rename: function (fieldname, filename) {
+         return filename+Date.now();
+         },*/
+        onFileUploadStart: function (file) {
+            console.log(file.originalname + ' is starting ...');
+            file_upload_done = false;
+        },
+        onFileUploadComplete: function (file) {
+            console.log(file.fieldname + ' uploaded to  ' + file.path);
+            file_upload_done = true;
+        }
+    }));
 };

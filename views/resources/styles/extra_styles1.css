@@ -11,7 +11,7 @@ body {
 
 .main_wrapper {
     margin: auto;
-    width: 66%;
+    width: 65%;
 }
 
 .theme-dropdown .dropdown-menu {
@@ -78,7 +78,8 @@ body {
     background: rgb(51, 51, 51);
     left: 18px;
     top: 71px;
-    padding-bottom: 45px; /* 30 for Abs Bottom Bar, 15 for space anyway */
+    padding-bottom: 30px; /* 30 for Abs Bottom Bar, 15 for space anyway */
+    z-index: 50;
 }
 .action-box .fw{
     display: none;
@@ -137,4 +138,13 @@ body {
 .action-box textarea.form-control {
     height: 140px;
     line-height: 25px;
+}
+
+.action-box .pick-image{
+    margin: 20px;
+    text-align: center;
+}
+
+#new_reply_condI{
+    height: 80px;
 }

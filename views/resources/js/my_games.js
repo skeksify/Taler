@@ -18,7 +18,7 @@ $(document).ready(function(){
                     success: function(result){
                         if(result.success) {
                             show_msg('Success!', function(){
-                                setTimeout(function(){ window.location = '/game/my-games'}, 1000)
+                                setTimeout(function(){ window.location = '/make/my-games'}, 1000)
                             });
                         } else
                             show_msg('Error!'+result.error);

@@ -5,15 +5,17 @@ var Server 		= require('mongodb').Server;
 var oId         = require('mongodb').ObjectID;
 var moment 		= require('moment');
 
-var auth = true;
-if(1) {
-    var dbPort 		= 53139;
-    var dbHost 		= 'ds053139.mongolab.com';
-    var dbName 		= 'taler';
+var auth, dbPort, dbHost, dbName;
+if(0) {
+    dbPort 		= 53139;
+    dbHost 		= 'ds053139.mongolab.com';
+    dbName 		= 'taler';
+    auth = true;
 } else {
-    var dbPort 		= 27017;
-    var dbHost 		= 'localhost';
-    var dbName 		= 'Taler';
+    dbPort 		= 27017;
+    dbHost 		= 'localhost';
+    dbName 		= 'Taler';
+    auth = false;
 }
 
 /* establish the database connection */
@@ -90,7 +92,6 @@ exports.autoLogin = function(user, pass, callback){
 }
 
 exports.manualLogin = function(user, pass, callback){
-    console.log(accounts.find().toArray(function(a,b){console.log(a)}));
     accounts.findOne({user:user}, function(e, o) {
         if (o == null){
             callback('user-not-found');
