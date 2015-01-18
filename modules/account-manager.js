@@ -6,7 +6,7 @@ var oId         = require('mongodb').ObjectID;
 var moment 		= require('moment');
 
 var auth, dbPort, dbHost, dbName;
-if(0) {
+if(1) {
     dbPort 		= 53139;
     dbHost 		= 'ds053139.mongolab.com';
     dbName 		= 'taler';
