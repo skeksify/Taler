@@ -68,7 +68,7 @@ exports.getGame = function(data, callback){
 }
 
 exports.getGames = function(user_id, callback){
-    games.find({owner: user_id}).toArray(
+    games.find({owner: user_id}, {title: 1}).toArray(
         function(e, res) {
             if(e)
                 callback(e)

@@ -1,17 +1,36 @@
 a {
     cursor: pointer;
 }
+
+a:hover{
+    color: rgb(93, 154, 207);
+}
+
 body {
     background: #222;
     color: rgb(239, 244, 229);
-    font-family: verdana;
+    font-family: 'IM Fell DW Pica SC', serif;
     padding-top: 70px;
     padding-bottom: 30px;
+    font-size: 20px;
+    font-variant: small-caps;
+}
+
+.login {
+    font-size: 16px;
 }
 
 .main_wrapper {
     margin: auto;
     width: 65%;
+}
+
+.main_wrapper .game_title{
+
+    font-family: 'IM Fell DW Pica SC', serif;
+    font-size: 34px;
+    color: rgb(153, 153, 153);
+    margin: 5px 0 20px;
 }
 
 .theme-dropdown .dropdown-menu {
@@ -32,7 +51,7 @@ body {
     clear: both;
 }
 .login_wrapper {
-    line-height: 50px;
+    line-height: 48px;
 }
 .login_wrapper a {
     vertical-align: middle;
@@ -49,24 +68,12 @@ body {
     padding: 0 5px;
     border-radius: 4px;
     color: rgb(0, 0, 0);
+    font-variant: normal;
 }
 
 .login_wrapper input[type=checkbox] {
     margin: 0 10px;
     vertical-align: middle;
-}
-
-.nav.navbar-nav {
-    width: 100%;
-}
-
-#navbar li.login {
-    float: right;
-}
-
-#navbar .loggedin{
-    vertical-align: middle;
-    line-height: 50px;
 }
 
 
@@ -138,6 +145,16 @@ body {
 .action-box textarea.form-control {
     height: 140px;
     line-height: 25px;
+    box-shadow: 0px 0px 12px rgb(0, 0, 0) inset;
+}
+.action-box input[type=text]{
+    box-shadow: 0px 0px 12px rgb(0, 0, 0) inset;
+}
+
+.form-control {
+    font-family: Ubuntu;
+    font-variant: normal;
+    font-size: 14px;
 }
 
 .action-box .pick-image{
@@ -147,4 +164,57 @@ body {
 
 #new_reply_condI{
     height: 80px;
+}
+
+
+
+.nav.navbar-nav {
+    width: 100%;
+}
+
+#navbar li.login {
+    float: right;
+}
+
+#navbar .loggedin{
+    vertical-align: middle;
+    line-height: 50px;
+}
+
+#navbar .active>a, .navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover, .navbar-inverse .navbar-nav>.open>a:focus {
+    background-image: linear-gradient(to bottom,rgb(50, 50, 50) 0,rgb(74, 74, 74) 100%);
+
+}
+
+#navbar .dropdown-menu{
+    background-color: rgb(69,69,69);
+    border: 0;
+    border-top-right-radius: 4px;
+}
+#navbar .dropdown-header {
+    cursor: default;
+}
+
+#navbar .dropdown-menu>li>a{
+    color: #bbb;
+}
+
+#navbar .dropdown-menu>li>a:hover{
+    background-image: linear-gradient(to bottom,rgb(49, 49, 49) 0,rgb(61, 61, 61) 100%);
+    color: #fff;
+}
+
+#navbar li.separator {
+    border: 1px solid;
+    border-width: 0px 0px 1px 0px;
+    margin: 10px;
+    border-color: rgb(51, 51, 51);
+}
+.yellowTextShadow{
+    text-shadow: 0px 0px 13px rgb(255, 255, 0);
+}
+.fadeOutTextShadow {
+    transition: text-shadow 1200ms;
+    text-shadow:
+        0px 0px 0px rgb(0, 0, 0);
 }

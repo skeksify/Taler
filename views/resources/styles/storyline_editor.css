@@ -1,9 +1,10 @@
 
-label.radio, input[type=radio]{
+label.radio, .radio-inline input[type=radio]{
     cursor: pointer;
+    position: inherit;
 }
 
-label.radio, input[type=text]{
+input[type=text]{
 
 }
 .radios-wrapper {
@@ -88,6 +89,13 @@ label.radio, input[type=text]{
 }
 .actionLabel, .entryLabel, .replyLabel{
     white-space: nowrap;
+    font-family: 'Ubuntu', serif;
+    font-variant: normal;
+    font-size: 14px;
+}
+
+.actionLabel:hover, .entryLabel:hover, .replyLabel:hover{
+    box-shadow: 0px 0px 10px rgba(255, 255, 0, 0.35);
 }
 
 .drawing_board .reply.notLeaf{
@@ -156,7 +164,7 @@ label.radio, input[type=text]{
     background-image: linear-gradient(to bottom,rgb(60, 60, 60) 0,rgb(34, 34, 34) 100%);
     padding: 10px;
     text-align: right;
-    font-size: 10px;
+    font-size: 16px;
 }
 
 #floater .top-bar div{
@@ -228,7 +236,7 @@ div.code {
 
 #tabs a:hover,
 #tabs a:focus {
-    border-bottom-color: #2ac7e1;
+    border-bottom-color: rgb(51, 122, 183);
     opacity: 1;
     filter: alpha(opacity=100);
 }

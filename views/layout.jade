@@ -16,6 +16,7 @@ html(lang='en')
         link(href='/rs/bootstrap.min.css', rel='stylesheet')
         link(href='/rs/bootstrap-theme.min.css', rel='stylesheet')
         link(href='/rs/extra_styles1.css', rel='stylesheet')
+        link(href='http://fonts.googleapis.com/css?family=IM+Fell+DW+Pica+SC|Ubuntu', rel='stylesheet', type='text/css')
         title
             ='Taler'+(page_title?' - '+page_title:'')
     body(role='document')
@@ -28,22 +29,18 @@ html(lang='en')
                             li(class=(page=='home'?'active':''))
                                 a(href='/') Home
                             if loggedin
-                                li(class=(page=='create_character'?'active':''))
-                                    a(href='/game/create_character') Create Character
-                                li(class=(page=='storyline_editor'?'active':''))
-                                    a(href='/make/my-games') My Games
+                                if 0
+                                    li(class=(page=='create_character'?'active':''))
+                                        a(href='/game/create_character') Create Character
                                 li.dropdown
-                                    a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-expanded='false')
-                                        | Loaded Boards
+                                    a.dropdown-toggle.my_games_link(href='#', data-toggle='dropdown', role='button', aria-expanded='false')
+                                        | My Games
                                         span.caret
-                                    ul.dropdown-menu.loaded-boards-nav-list(role='menu')
-                                        li.dropdown-header Nav header
-                                        li
-                                            a(href='#') Separated link
-                                        li
-                                            a(href='#') One more separated link
-                                li
-                                    a(href='#loaded', onclick='redraw()') Redraw
+                                    ul.dropdown-menu.loaded-boards-nav-list(role='menu')#games_list
+                                        li.dropdown-header Loading...
+                                if page=='storyline_editor' && game
+                                    li
+                                        a(href='#')#save_game Save Game
                             li.login
                                 include ./login.jade
             include ./action_box.jade

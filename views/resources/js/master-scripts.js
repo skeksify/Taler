@@ -3,9 +3,34 @@
  */
 
 var Tmed = 500;
-
+var my_games_loaded = false;
 $(document).ready(function(){
-    $('#fire_signup').click(function(){ window.location = '/users/signup'});
+    $('.my_games_link').unbind().click(loadGameList)
+    $('#fire_signup').click(function(){
+        open_dialog('Sign Up', function(){
+            var settings = {
+                username: $('#signup_username').val(),
+                password: $('#signup_password').val(),
+                email: $('#signup_email').val()
+            }
+            if(settings.username && settings.password){
+                var fail = function(){ alert('Signup Failed, please report to Ben if trying again doesn\'t help (Maybe even a full refresh)') };
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    url: '/users/signup',
+                    data: settings,
+                    success: function(result){
+                        if(result.success)
+                            alert('Signup Success! You may log in')
+                        else
+                            fail()
+                    },
+                    error: fail
+                });
+            }
+        })
+    });
     $('#fire_login').click(function(){
         var jthat = $(this);
         var settings = {
@@ -25,7 +50,7 @@ $(document).ready(function(){
                         jthat.html('Success!');
                         setTimeout(function(){ window.location = '/'}, 1000)
                     } else
-                        jthat.html(result.error);
+                        jthat.html(result.error.replace(/-/g,' '));
                 },
                 error: function(){ jthat.html('Failed') }
             });
@@ -35,8 +60,48 @@ $(document).ready(function(){
 
     $('#action_box_id .bottom-bar .cancel').click(close_dialog);
 });
-
-
+var loadGameList = function(){
+    if(!my_games_loaded){
+        $('#games_list').html('<li class="dropdown-header" style="font-size: 16px;">Loading...</li>');
+        $.ajax({
+            type: 'get',
+            url: '/make/my-games',
+            success: function(result){
+                $('#games_list').html(result);
+                my_games_loaded = true;
+                $('#new_game_btn').click(newGame)
+            }
+        });
+    }
+}
+var newGame = function(){
+    open_dialog('New Game', function(){
+        var settings = {
+            title: $('#new_game_titleI').val(),
+            teaser: $('#new_game_teaserI').val()
+        }
+        if(settings.title)
+            show_msg('Working...', function(){
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    url: '/make/create_game',
+                    data: settings,
+                    success: function(result){
+                        if(result.success) {
+                            my_games_loaded = false;
+                            loadGameList();
+                            set_action_box_ok(close_dialog);
+                            show_msg('Success!');
+                            eureka('.my_games_link');
+                        } else
+                            show_msg('Error!<br>'+result.error);
+                    },
+                    error: function(){ show_msg('Failed') }
+                });
+            });
+    })
+}
 
 function open_dialog(dialog, okFunction){
     set_action_box_ok(okFunction);
@@ -49,6 +114,7 @@ function open_dialog(dialog, okFunction){
         'New Playground': 'playground-form-wrapper',
         'Edit Entry': 'entry-form-wrapper',
         'Edit Reply': 'reply-form-wrapper',
+        'Sign Up': 'signup-form-wrapper',
         'msg': 'msg'
     };
     var box_div = $('#action_box_id');
@@ -71,7 +137,6 @@ function show_msg(msg, cb){
     var msg_div = $('.msg', box_div);
     var cancel_div = $('.bottom-bar .cancel', box_div);
     var cont_div = $('.fw:visible', box_div);
-    msg_div.hide();
     cancel_div.animate({opacity: 0}, 200, 'linear');
     if(cont_div.length)
         cont_div.slideUp(Tmed, function(){
@@ -129,6 +194,17 @@ function mj(){ return JSON.stringify(boards); }
 function mjs(){ return JSON.stringify(playgrounds); }
 function cl(c){ console.log(c) };
 
+
+function eureka(jQuery_str){
+    var obj = $(jQuery_str);
+    obj.addClass('yellowTextShadow');
+    setTimeout(function(){
+        obj.addClass('fadeOutTextShadow');
+        setTimeout(function(){
+            obj.removeClass('fadeOutTextShadow').removeClass('yellowTextShadow');
+        }, 3000);
+    }, 4000);
+}
 
 
 // Override alert!

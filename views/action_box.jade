@@ -61,6 +61,9 @@
                         label.control-label(for='new_entry_speechI') Speech:
                         .controls
                             textarea#new_entry_speechI.form-control
+                        br
+                        .pick-image
+                            .btn Image
         .reply-form-wrapper.fw
             form(role='form')
                 fieldset
@@ -77,6 +80,22 @@
                         label.control-label(for='new_reply_condI') Condition:
                         .controls
                             textarea#new_reply_condI.form-control(required='')
+        .signup-form-wrapper.fw
+            form(role='form')
+                fieldset
+                    // Text input
+                    .control-group
+                        label.control-label(for='signup_username') Username:
+                        .controls
+                            input#signup_username.form-control(type='text', placeholder='', required='')
+                        br
+                        label.control-label(for='signup_password') Password:
+                        .controls
+                            password#signup_password.form-control(type='text', placeholder='', required='')
+                        br
+                        label.control-label(for='signup_email') E-Mail:
+                        .controls
+                            input#signup_email.form-control(type='text', placeholder='', required='')
         .board-form-wrapper.fw
             form(role='form')
                 fieldset
@@ -87,7 +106,7 @@
                             input#new_board_titleI.form-control(type='text', placeholder='Personal Use', required='')
                         br
                         div
-                            label.radio-inline(for='actionEff-0')
+                            label.radio-inline(for='bType-0')
                                 input#bType-0(type='radio', name='new_board_type', value='con', checked='checked')
                                 | Conversation
                             label.radio-inline(for='bType-1')
@@ -98,8 +117,6 @@
                         .controls
                             textarea#new_board_descI.form-control.speech(required='')
                         input#board_image(type='hidden', value='')
-                        .pick-image
-                            .btn Image
 
 
     .msg.fw

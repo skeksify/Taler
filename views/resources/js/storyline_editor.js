@@ -199,10 +199,12 @@ function engageNewEntity(paramObject){
                     actionEffect: actionEffect,
                     actionType: actionType
                 };
-                updatedEntity = entityToUpdate.setLeadsTo(new Action(settings));
-                if(actionType=='redirect')
-                    updatedEntity.setPath(path);
-                close_dialog('"'+updatedEntity.actionLabel+'" added successfully!', redraw, board_id);
+                if(settings.actionLabel){
+                    updatedEntity = entityToUpdate.setLeadsTo(new Action(settings));
+                    if(actionType=='redirect')
+                        updatedEntity.setPath(path);
+                    close_dialog('"'+updatedEntity.actionLabel+'" added successfully!', redraw, board_id);
+                }
                 break;
             case 'New Reply':
                 var settings = {
@@ -210,16 +212,20 @@ function engageNewEntity(paramObject){
                     replySpeech: $('#new_reply_speechI').val(),
                     replyCondition: $('#new_reply_condI').val()
                 };
-                updatedEntity = entityToUpdate.addReply(new Reply(settings));
-                close_dialog('"'+updatedEntity.replyLabel+'" added successfully!', redraw, board_id);
+                if(settings.replyLabel){
+                    updatedEntity = entityToUpdate.addReply(new Reply(settings));
+                    close_dialog('"'+updatedEntity.replyLabel+'" added successfully!', redraw, board_id);
+                }
                 break;
             case 'New Entry':
                 var settings = {
                     entryLabel: $('#new_entry_labelI').val(),
                     entrySpeech: $('#new_entry_speechI').val()
                 };
-                updatedEntity = entityToUpdate.setLeadsTo(new Entry(settings));
-                close_dialog('"'+updatedEntity.entryLabel+'" added successfully!', redraw, board_id);
+                if(settings.entryLabel){
+                    updatedEntity = entityToUpdate.setLeadsTo(new Entry(settings));
+                    close_dialog('"'+updatedEntity.entryLabel+'" added successfully!', redraw, board_id);
+                }
                 break;
         }
     });
@@ -336,7 +342,7 @@ function getEntityBySimplePath(path){
 }
 function getElementBySimplePath(path){
     var firsTwo = path.splice(0,2);
-    var result = $('.drawing_panel['+key+'='+firsTwo[1]+"]>.drawing_board", $('.playground['+key+'='+firsTwo[0]+']'));
+    var result = $('.drawing_panel['+key+'="'+firsTwo[1]+'"]>.drawing_board', $('.playground['+key+'='+firsTwo[0]+']'));
     for(var i in path)
         result = result.closestDescendant('[breadcrumbs="'+path[i]+'"]');
     return result;
@@ -397,10 +403,12 @@ function setPlaygroundBindings(){
                 boardType: $('input[name=new_board_type]:checked').val(),
                 boardDesc: $('#new_board_descI').val()
             };
-            var tmpNewBoard = new Board(settings);
-            tmpNewBoard.setFirstEntry(new Entry({entryLabel: 'First Entry! (Right click to edit)'}));
-            playgrounds[playground_id].addBoard(tmpNewBoard);
-            close_dialog('New Board Added!', redraw);
+            if(settings.boardTitle){
+                var tmpNewBoard = new Board(settings);
+                tmpNewBoard.setFirstEntry(new Entry({entryLabel: 'First Entry! (Right click to edit)'}));
+                playgrounds[playground_id].addBoard(tmpNewBoard);
+                close_dialog('New Board Added!', redraw);
+            }
         });
     });
 
@@ -423,7 +431,8 @@ function setPlaygroundBindings(){
             case "Action":
                 editF = null;
                 label = entity.actionLabel;
-                window_markup.push(entity.actionEffect.toString());
+                //window_markup.push(entity.actionEffect.toString());
+                window_markup.push('Type:<br/>'+entity.actionType);
                 if(path = entity.getPath()){
                     var element = getElementBySimplePath(path.split(','));
                     var playable = element.children().first().find('.entryLabel');//.addClass('pickable');
@@ -435,7 +444,10 @@ function setPlaygroundBindings(){
                 dialog_title = 'Edit Entry';
                 label = entity.entryLabel;
                 speech = htmlEscape(entity.entrySpeech);
-                window_markup.push('Speech:<br/>'+speech);
+                if(speech)
+                    window_markup.push('Speech:<br/>'+speech);
+                else
+                    window_markup.push('Empty');
                 var input_label = $('#new_entry_labelI');
                 var ta_speech = $('#new_entry_speechI');
                 input_label.val(label);
@@ -451,7 +463,12 @@ function setPlaygroundBindings(){
                 label = entity.replyLabel;
                 speech = htmlEscape(entity.replySpeech);
                 cond = entity.replyCondition;
-                window_markup.push((cond?('Condition:<br/><div class="code">'+cond+'</div><br/>'):'')+'Speech:<br/>'+speech);
+                if(cond)
+                    window_markup.push('Condition:<br/><div class="code">'+cond+'</div><br/>');
+                if(speech)
+                    window_markup.push('Speech:<br/>'+speech);
+                else
+                    window_markup.push('Empty');
                 var input_label = $('#new_reply_labelI');
                 var ta_speech = $('#new_reply_speechI');
                 var ta_cond = $('#new_reply_condI');
@@ -467,7 +484,8 @@ function setPlaygroundBindings(){
                 };
                 break;
         }
-        floater.hide().css('top', triggerer_pos.top+height-5).css('left', triggerer_pos.left+width-5).fadeIn(100);
+        //floater.hide().css('top', triggerer_pos.top+height-5).css('left', triggerer_pos.left+width-5).fadeIn(100);
+        floater.hide().css('top', ev.pageY+10).css('left', ev.pageX+10).fadeIn(100);
         floater.find('.edit').unbind();
         if(isFu(editF))
             floater.find('.edit').click(function(){
@@ -537,7 +555,7 @@ function redraw(who){
                         navBarMarkup.push('<li><a href="#">'+boards[b].title+'</a></li>');
                     }
                 markup.push('</div>');
-                markup.push('<input class="btn btn-add-board newboard" type="button" value="New Board" style="margin-top: 20px" />');
+                markup.push('<a class="newboard" href="#">New Board</a>');
             markup.push('</div>');
         }
         tabs.push('<li><a href="#" onclick="new_playground()">+</a></li>');
@@ -602,12 +620,14 @@ function new_playground(){
         var settings = {
             playgroundTitle: $('#new_playground_titleI').val()
         };
-        var tmpNewPlayground = new Playground(settings);
-        var new_playground_id = playgrounds.push(tmpNewPlayground);
-        close_dialog('New Playground Added!', function(){
-            window.location = ('#playground_'+(new_playground_id-1));
-            redraw();
-        });
+        if(settings.playgroundTitle){
+            var tmpNewPlayground = new Playground(settings);
+            var new_playground_id = playgrounds.push(tmpNewPlayground);
+            close_dialog('New Playground Added!', function(){
+                window.location = ('#playground_'+(new_playground_id-1));
+                redraw();
+            });
+        }
     });
 }
 
@@ -618,7 +638,7 @@ $(document).ready(function(){
 
     // don't - load_playground(); //Try
 
-    $('#savealll').click(function(){
+    $('#save_game').click(function(){
         save_game();
     });
 

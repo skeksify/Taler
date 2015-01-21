@@ -1,16 +1,17 @@
 if loggedin
     .loggedin
-        | Hi #{luser.user}!
+        div(style="float: right; padding: 0 5px")
+            | (#{luser.user})
         a(style="float: right; padding: 0 5px" href="/users/logout") Logout
 
 else
     .login_wrapper
         div
-            input(type="text" placeholder="Username" value="a")#loginun
+            input(type="text" placeholder="Username" value="")#loginun
         div
-            input(type="password" placeholder="Password" value="a")#loginps
+            input(type="password" placeholder="Password" value="")#loginps
         div
-            input(type="checkbox", checked='checked')#loginrm
+            input(type='checkbox', checked='checked', title='Remember Me')#loginrm
         a#fire_login Login
         | &nbsp;/&nbsp;
         a#fire_signup Sign Up

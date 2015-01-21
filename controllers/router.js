@@ -2,6 +2,7 @@
 var CT = require('./modules/country-list');
 var EM = require('./modules/email-dispatcher');
 */
+
 var AM = require('../modules/account-manager');
 var multer = require('multer');
 var file_upload_done = false;
@@ -11,6 +12,7 @@ var add_flavors = function(o, req){
     obj.loggedin = !!req.session.user;
     if(req.session.user){
         obj.luser = req.session.user;
+
     }
     return obj;
 }
@@ -20,7 +22,7 @@ var logged = function(req){ return !!req.session.user }
 module.exports = function(app) {
 
     app.get( '/', function(req, res){
-        if (req.cookies.user == undefined || req.cookies.pass == undefined){ // No saved cookies
+        if (!req.cookies.user || !req.cookies.pass){ // Not enough cookiz
             res.redirect('/home');
         } else { // Has cookies
             if (req.session.user == null){
@@ -44,7 +46,7 @@ module.exports = function(app) {
     });
 
     app.get( '/home', function(req, res){
-        console.log(req.files);
+        console.log(req.session.user);
         res.render('home', add_flavors({
             page: 'home',
             page_title: 'Home'
@@ -70,11 +72,7 @@ module.exports = function(app) {
     app.get( '/make/my-games', function(req, res){
         if(logged(req))
             AM.getGames(req.session.user._id, function(e, o){
-                res.render('my_games', add_flavors({
-                    page: 'my_games',
-                    page_title: 'My Games',
-                    my_games: o
-                }, req));
+                res.render('my_games',{my_games: o});
             });
         else //Not Logged
             res.redirect('/home');
@@ -94,7 +92,6 @@ module.exports = function(app) {
 
     app.post('/make/create_game', function(req, res){
         if(logged(req)){
-            console.log(req.session.user);
             AM.createNewGame({
                 title 	: req.param('title'),
                 teaser 	: req.param('teaser'),
@@ -125,20 +122,12 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/users/logout', function(req, res){
-        req.session.destroy();
-        req.session = null;
-        res.redirect('/home');
-    });
-
-    app.get( '/users/signup', function(req, res){
-        if(logged(req))
-            res.redirect('/home')
-        else
-            res.render('signup', add_flavors({
-                page: 'signup',
-                page_title: 'Sign Up'
-            }, req));
+    app.get( '/users/logout', function(req, res){
+        req.session.destroy(function(){
+            req.session = null;
+            res.clearCookie('pass');
+            res.redirect('/home');
+        });
     });
 
     app.post('/users/signup', function(req, res){
@@ -179,10 +168,10 @@ module.exports = function(app) {
     app.get( '/favicon.ico', function(req, res, next){ if(0) next(); } );
 
     app.get('*', function(req, res) {
-        res.render('404', {
+        res.render('404', add_flavors({
             page: '404',
             page_title: 'Unfound!'
-        });
+        }, req));
     });
 
     app.use(multer({
