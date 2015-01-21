@@ -21,8 +21,10 @@ $(document).ready(function(){
                     url: '/users/signup',
                     data: settings,
                     success: function(result){
-                        if(result.success)
-                            alert('Signup Success! You may log in')
+                        if(result.success){
+                            set_action_box_ok(close_dialog);
+                            show_msg('Success!<br /><br />You may log in');
+                        }
                         else
                             fail()
                     },

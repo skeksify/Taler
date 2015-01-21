@@ -1,0 +1,11 @@
+if my_games && my_games.length
+    // li.dropdown-header Saved Games:
+    - for (var i = 0; i < my_games.length; i++)
+        li
+            a(href='/make/'+my_games[i]._id)
+                =my_games[i].title
+else
+    li.dropdown-header No Games
+li.separator
+li
+    a(href='#')#new_game_btn New Game!
