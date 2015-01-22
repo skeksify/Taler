@@ -5,7 +5,8 @@
 var Tmed = 500;
 var my_games_loaded = false;
 $(document).ready(function(){
-    $('.my_games_link').unbind().click(loadGameList)
+    $('.my_games_link').unbind().click(loadGameList);
+    $('#konssl .x').click(function(){$('#konssl').fadeOut()})
     $('#fire_signup').click(function(){
         open_dialog('Sign Up', function(){
             var settings = {

@@ -40,12 +40,14 @@ html(lang='en')
                                         li.dropdown-header Loading...
                                 if page=='storyline_editor' && game
                                     li
-                                        a(href='#')#save_game Save Game
+                                        a#save_game Save Game
                             li.login
                                 include ./login.jade
                             if page=='storyline_editor'
                                 li#konssl
                                     .log-bar
+                                        .x
+                                            a.reg(style='color:white;') X
                                         .text.reg
             include ./action_box.jade
             block content
