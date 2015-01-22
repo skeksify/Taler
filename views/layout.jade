@@ -6,7 +6,7 @@ html(lang='en')
         meta(http-equiv='X-UA-Compatible', content='IE=edge')
         meta(name='viewport', content='width=device-width, initial-scale=1')
         meta(name='description', content='Taler - Create your own game!')
-        meta(name='author', content='Ben Haram')
+        meta(name='author', content='Ben Haran')
         script(type='text/javascript', src='/rj/jquery-2.1.1.min.js')
         // script type="text/javascript" src="/rj/underscore-min.js"></script
         script(type='text/javascript', src='/rj/bootstrap.min.js')
@@ -43,6 +43,10 @@ html(lang='en')
                                         a(href='#')#save_game Save Game
                             li.login
                                 include ./login.jade
+                            if page=='storyline_editor'
+                                li#konssl
+                                    .log-bar
+                                        .text.reg
             include ./action_box.jade
             block content
 block scripts

@@ -46,7 +46,6 @@ module.exports = function(app) {
     });
 
     app.get( '/home', function(req, res){
-        console.log(req.session.user);
         res.render('home', add_flavors({
             page: 'home',
             page_title: 'Home'
@@ -66,7 +65,7 @@ module.exports = function(app) {
                     res.redirect('/home');
             });
         else //Not Logged
-            res.redirect('/home');
+            res.redirect('/');
     }); // Work on a game! getGame
 
     app.get( '/make/my-games', function(req, res){

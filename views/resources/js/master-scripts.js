@@ -22,7 +22,7 @@ $(document).ready(function(){
                     data: settings,
                     success: function(result){
                         if(result.success){
-                            set_action_box_ok(close_dialog);
+                            setActionBoxOk(close_dialog);
                             show_msg('Success!<br /><br />You may log in');
                         }
                         else
@@ -93,7 +93,7 @@ var newGame = function(){
                         if(result.success) {
                             my_games_loaded = false;
                             loadGameList();
-                            set_action_box_ok(close_dialog);
+                            setActionBoxOk(close_dialog);
                             show_msg('Success!');
                             eureka('.my_games_link');
                         } else
@@ -106,7 +106,7 @@ var newGame = function(){
 }
 
 function open_dialog(dialog, okFunction){
-    set_action_box_ok(okFunction);
+    setActionBoxOk(okFunction);
     var dialogs = {
         'New Action': 'action-form-wrapper',
         'New Entry': 'entry-form-wrapper',
@@ -181,8 +181,10 @@ function close_dialog(msg, cb, cbparams){
     }
 }
 
-function set_action_box_ok(func){
-    $('#action_box_id .ok').unbind().click(func);
+function setActionBoxOk(func){
+    var ok = $('#action_box_id .ok').unbind();
+    if(isFu(func))
+        ok.click(func);
 }
 
 
@@ -192,20 +194,28 @@ function isUn(o){ return typeof (o)=='undefined'; }
 function isSt(o){ return typeof (o)=='string'; }
 function isOb(o){ return typeof (o)=='object'; }
 function isFu(o){ return typeof (o)=='function'; }
-function mj(){ return JSON.stringify(boards); }
 function mjs(){ return JSON.stringify(playgrounds); }
-function cl(c){ console.log(c) };
+function cl(c){ eureka($('.text', $('#konssl').fadeIn()).prepend('<div><div class="cont">'+c+'</div><div class="time">'+getShortTime()+'</div><div class="clr"></div></div>')) };
 
 
-function eureka(jQuery_str){
+var getShortTime = function(){
+    function pad(x){ return !x ? '00':(x<10 ? ('0'+x) : x) }
+    var now = new Date();
+    return pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+}
+
+function eureka(jQuery_str, box){
     var obj = $(jQuery_str);
-    obj.addClass('yellowTextShadow');
+    var boxtext = box ? 'Box' : 'Text';
+    var withSh = 'yellow'+boxtext+'Shadow';
+    var withoSh = 'fadeOut'+boxtext+'Shadow';
+    obj.addClass(withSh);
     setTimeout(function(){
-        obj.addClass('fadeOutTextShadow');
+        obj.addClass(withoSh);
         setTimeout(function(){
-            obj.removeClass('fadeOutTextShadow').removeClass('yellowTextShadow');
+            obj.removeClass(withoSh).removeClass(withSh);
         }, 3000);
-    }, 4000);
+    }, 1000);
 }
 
 

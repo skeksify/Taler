@@ -203,7 +203,9 @@ function engageNewEntity(paramObject){
                     updatedEntity = entityToUpdate.setLeadsTo(new Action(settings));
                     if(actionType=='redirect')
                         updatedEntity.setPath(path);
-                    close_dialog('"'+updatedEntity.actionLabel+'" added successfully!', redraw, board_id);
+                    close_dialog();
+                    cl('"'+updatedEntity.actionLabel+'" added successfully');
+                    redraw(board_id);
                 }
                 break;
             case 'New Reply':
@@ -214,7 +216,9 @@ function engageNewEntity(paramObject){
                 };
                 if(settings.replyLabel){
                     updatedEntity = entityToUpdate.addReply(new Reply(settings));
-                    close_dialog('"'+updatedEntity.replyLabel+'" added successfully!', redraw, board_id);
+                    close_dialog();
+                    cl('"'+updatedEntity.replyLabel+'" added successfully');
+                    redraw(board_id);
                 }
                 break;
             case 'New Entry':
@@ -224,7 +228,9 @@ function engageNewEntity(paramObject){
                 };
                 if(settings.entryLabel){
                     updatedEntity = entityToUpdate.setLeadsTo(new Entry(settings));
-                    close_dialog('"'+updatedEntity.entryLabel+'" added successfully!', redraw, board_id);
+                    close_dialog();
+                    cl('"'+updatedEntity.entryLabel+'" added successfully');
+                    redraw(board_id);
                 }
                 break;
         }
@@ -407,7 +413,9 @@ function setPlaygroundBindings(){
                 var tmpNewBoard = new Board(settings);
                 tmpNewBoard.setFirstEntry(new Entry({entryLabel: 'First Entry! (Right click to edit)'}));
                 playgrounds[playground_id].addBoard(tmpNewBoard);
-                close_dialog('New Board Added!', redraw);
+                close_dialog();
+                cl('New Board Added!');
+                redraw();
             }
         });
     });
@@ -454,8 +462,10 @@ function setPlaygroundBindings(){
                 ta_speech.val(speech);
                 editF = function(){
                     entity.setLabel(input_label.val());
-                    entity.setSpeech(ta_speech.val())
-                    close_dialog('"'+entity.entryLabel+'" updated successfully!', redraw, simple_path[0]);
+                    entity.setSpeech(ta_speech.val());
+                    close_dialog();
+                    cl('"'+entity.entryLabel+'" updated successfully');
+                    redraw(simple_path[0]);
                 }
                 break;
             case "Reply":
@@ -480,7 +490,9 @@ function setPlaygroundBindings(){
                     entity.setLabel(input_label.val());
                     entity.setSpeech(ta_speech.val());
                     entity.setCondition(ta_cond.val());
-                    close_dialog('"'+entity.replyLabel+'" updated successfully!', redraw, simple_path[0]);
+                    close_dialog();
+                    cl('"'+entity.replyLabel+'" updated successfully');
+                    redraw(simple_path[0]);
                 };
                 break;
         }
@@ -585,7 +597,7 @@ function save_game(){
         data: my_tmp_boards,
         success: function(result){
             if(result.success)
-                alert('Saved!');
+                cl('Saved');
             else
                 alert(result.error);
         }
@@ -623,10 +635,10 @@ function new_playground(){
         if(settings.playgroundTitle){
             var tmpNewPlayground = new Playground(settings);
             var new_playground_id = playgrounds.push(tmpNewPlayground);
-            close_dialog('New Playground Added!', function(){
-                window.location = ('#playground_'+(new_playground_id-1));
-                redraw();
-            });
+            close_dialog();
+            cl('New Playground Added!');
+            window.location = ('#playground_'+(new_playground_id-1));
+            redraw();
         }
     });
 }

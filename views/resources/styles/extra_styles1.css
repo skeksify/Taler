@@ -16,6 +16,11 @@ body {
     font-variant: small-caps;
 }
 
+.reg {
+    font-family: 'Ubuntu';
+    font-variant: normal;
+}
+
 .login {
     font-size: 16px;
 }
@@ -26,8 +31,6 @@ body {
 }
 
 .main_wrapper .game_title{
-
-    font-family: 'IM Fell DW Pica SC', serif;
     font-size: 34px;
     color: rgb(153, 153, 153);
     margin: 5px 0 20px;
@@ -210,11 +213,51 @@ body {
     margin: 10px;
     border-color: rgb(51, 51, 51);
 }
+
+
+.yellowBoxShadow{
+    box-shadow: 0px 0px 13px rgb(255, 255, 0);
+}
+.fadeOutBoxShadow {
+    transition: box-shadow 2200ms;
+    box-shadow:
+        0px 0px 0px rgb(0, 0, 0);
+}
+
 .yellowTextShadow{
     text-shadow: 0px 0px 13px rgb(255, 255, 0);
 }
 .fadeOutTextShadow {
-    transition: text-shadow 1200ms;
+    transition: text-shadow 2200ms;
     text-shadow:
         0px 0px 0px rgb(0, 0, 0);
+}
+
+#konssl {
+    display: none;
+    float: right;
+    line-height: 50px;
+    margin: 0 25px;
+}
+
+#konssl .log-bar {}
+
+#konssl .log-bar .text{
+    line-height: 16px;
+    font-size: 14px;
+    vertical-align: bottom;
+    margin: 10px 0;
+    border: 0px solid rgb(34, 34, 34);
+    padding: 2px 25px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 9px rgb(33, 33, 33) inset;
+    overflow: auto;
+    height: 30px;
+    width: 450px;
+}
+#konssl .log-bar .text .cont{
+    float: left;
+}
+#konssl .log-bar .text .time{
+    float: right;
 }
