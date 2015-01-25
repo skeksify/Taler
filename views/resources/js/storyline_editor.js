@@ -6,6 +6,7 @@
 
 var playgrounds = [];
 var key = 'breadcrumbs';
+var log_console = 0;
 // Entities: //
 
 function Playground(settings){
@@ -15,6 +16,7 @@ function Playground(settings){
     };
     loadSettings(this, settings, defaults);
     forceSettings(this, { playgroundBoards: [] });
+    this.onUpdate = function(){ if(log_console) cl('"'+this.playgroundTitle+'" (Playground) Updated'); };
     this.addBoard = function(new_board){
         return this.playgroundBoards.push(new_board);
     }
@@ -34,9 +36,13 @@ function Board(settings){
     };
     loadSettings(this, settings, defaults);
     forceSettings(this, { interactionTree: null });
+    this.onUpdate = function(){ if(log_console) cl('"'+this.boardTitle+'" (Board) Updated'); };
     this.setFirstEntry = function(new_entry){
         return this.interactionTree = new_entry;
     }
+    this.setTitle = function(new_title){ this.boardTitle = new_title; this.onUpdate(); return this; }
+    this.setType = function(new_type){ this.boardType = new_type; this.onUpdate(); return this; }
+    this.setDesc = function(new_desc){ this.boardDesc = new_desc; this.onUpdate(); return this; }
 }
 
 function Entry(settings){
@@ -47,7 +53,7 @@ function Entry(settings){
     };
     loadSettings(this, settings, defaults);
     forceSettings(this, { replies: [] });
-    this.onUpdate = function(){ if(0) cl('Entry Updated'); };
+    this.onUpdate = function(){ if(log_console) cl('"'+this.entryLabel+'" (Entry) Updated'); };
     this.addReply = function(reply){
         if(reply instanceof Reply){
             this.replies.push(reply);
@@ -75,18 +81,22 @@ function Reply(settings){
     };
     loadSettings(this, settings, defaults);
     forceSettings(this, { leadsTo: null });
-    this.onUpdate = function(){ if(0) cl('Reply Updated'); };
+    this.onUpdate = function(){ if(log_console) cl('"'+this.replyLabel+'" (Reply) Updated'); };
     this.setLeadsTo = function(leadsTo){
-        switch (Object.getPrototypeOf(leadsTo)){
-            case Entry.prototype:
-                this.leadsTo = leadsTo;
-                this.onUpdate();
-                break;
-            case Action.prototype:
-                this.leadsTo = leadsTo;
-                this.onUpdate();
-                break;
-        }
+        if(!leadsTo){
+            this.leadsTo = null;
+            this.onUpdate();
+        } else
+            switch (Object.getPrototypeOf(leadsTo)){
+                case Entry.prototype:
+                    this.leadsTo = leadsTo;
+                    this.onUpdate();
+                    break;
+                case Action.prototype:
+                    this.leadsTo = leadsTo;
+                    this.onUpdate();
+                    break;
+            }
         return this.leadsTo;
     }
     this.follow = function(){
@@ -100,8 +110,7 @@ function Reply(settings){
 function Action(settings){
     /*
     Action will be leadTo from Reply (Reply's label/body should describe the action)
-    Action will leadTo Entry
-    When playing, if arriving to Action, should run actionEffect and direct to leadsTo
+    Action will leadTo Entry or another Action
      */
     var defaults = {
         leadsTo: null,
@@ -111,7 +120,7 @@ function Action(settings){
     };
 
     loadSettings(this, settings, defaults);
-    this.onUpdate = function(){ if(0) cl('Action Updated'); };
+    this.onUpdate = function(){ if(log_console) cl('"'+this.actionLabel+'" (Action) Updated'); };
 
     this.setEffect = function(new_val_actionEffect){
         if(isFu(new_val_actionEffect)){
@@ -159,6 +168,7 @@ function engageNewEntity(paramObject){
      Todo: Support Father Entity Change (while box open), not sure
      */
 
+    resetActionboxValues();
     open_dialog(entityType, function(){
         var updatedEntity = null;
         var entityToUpdate = getEntityBySimplePath(makeSimplePath(that));
@@ -204,7 +214,7 @@ function engageNewEntity(paramObject){
                     if(actionType=='redirect')
                         updatedEntity.setPath(path);
                     close_dialog();
-                    cl('"'+updatedEntity.actionLabel+'" added successfully');
+                    cl('"'+updatedEntity.actionLabel+'" (Action) added successfully');
                     redraw(board_id);
                 }
                 break;
@@ -217,7 +227,7 @@ function engageNewEntity(paramObject){
                 if(settings.replyLabel){
                     updatedEntity = entityToUpdate.addReply(new Reply(settings));
                     close_dialog();
-                    cl('"'+updatedEntity.replyLabel+'" added successfully');
+                    cl('"'+updatedEntity.replyLabel+'" (Reply) added successfully');
                     redraw(board_id);
                 }
                 break;
@@ -229,7 +239,7 @@ function engageNewEntity(paramObject){
                 if(settings.entryLabel){
                     updatedEntity = entityToUpdate.setLeadsTo(new Entry(settings));
                     close_dialog();
-                    cl('"'+updatedEntity.entryLabel+'" added successfully');
+                    cl('"'+updatedEntity.entryLabel+'" (Entry) added successfully');
                     redraw(board_id);
                 }
                 break;
@@ -334,9 +344,14 @@ function recur_draw_entry(entry){
     }
 }
 
-function getEntityBySimplePath(path){
+function getEntityBySimplePath(oldPath){
+    var path = oldPath.slice(); // Make copy, don't ruin oldPath
     var firsTwo = path.splice(0,2);
+    if(oldPath.length==1) // Playground
+        return playgrounds[firsTwo[0]];
     var board = playgrounds[firsTwo[0]].getBoard(firsTwo[1]);
+    if(!path.length) // Board
+        return board;
     var resultEntity = board.interactionTree;
     if(path.splice(0,1)[0]=='+') //If begins with entry (And take it out)
         for(var key in path)
@@ -377,9 +392,36 @@ function toggleLight(element){
 }
 
 function setPlaygroundBindings(){
-
     resetTabs();
     makeTabs();
+
+    //Board Tools (Edit, Delete)
+    $('.edit_board').click(function(){
+        var parents = $(this).parents('['+key+']');
+        blur_context();
+        var board = getEntityBySimplePath([$(parents[1]).attr(key), $(parents[0]).attr(key)]);
+        if(board.boardType)
+            $('input[name=new_board_type][value='+board.boardType+']').prop('checked', true);
+        var input_title = $('#new_board_titleI').val(board.boardTitle);
+        var ta_desc = $('#new_board_descI').val(board.boardDesc);
+        open_dialog('Edit Board', function(){
+            board.setTitle(input_title.val());
+            board.setDesc(ta_desc.val());
+            board.setType($('input[name=new_board_type]:checked').val());
+            cl('"'+board.boardTitle+'" (Board) updated');
+            close_dialog(); redraw();
+        });
+    });
+    $('.delete_board').click(function(){
+        var parents = $(this).parents('['+key+']');
+        var playground_id = $(parents[1]).attr(key);
+        var board_id = $(parents[0]).attr(key);
+        alert('Are you sure?', function(){ //On OK
+            var deleted_board = playgrounds[playground_id].playgroundBoards.splice(board_id, 1)[0];
+            cl('"'+deleted_board.boardTitle+'" (Board) deleted');
+            close_dialog(); redraw();
+        })
+    })
     $('#TargetEntryButton').click(function(){
         var pather = $('#target_entry_path');
         var that = this;
@@ -403,6 +445,7 @@ function setPlaygroundBindings(){
 
     $('.newboard').unbind().click(function(){
         var playground_id = $(this).parent().attr(key);
+        resetActionboxValues();
         open_dialog('New Board', function(){
             var settings = {
                 boardTitle: $('#new_board_titleI').val(),
@@ -434,9 +477,10 @@ function setPlaygroundBindings(){
         var width = parseInt(triggerer.css('width'));//ev.clientX
         all_labels.removeClass('active_label');
         triggerer.addClass('active_label');
-        var dialog_title, label, speech, cond, window_markup = [], editF, deleteF;
+        var dialog_title, label, speech, cond, window_markup = [], editF, delete_msg;
         switch (entity_type){
             case "Action":
+                delete_msg = '"'+entity.actionLabel+'" (Action) deleted';
                 editF = null;
                 label = entity.actionLabel;
                 //window_markup.push(entity.actionEffect.toString());
@@ -449,6 +493,7 @@ function setPlaygroundBindings(){
                 }
                 break;
             case "Entry":
+                delete_msg = '"'+entity.entryLabel+'" (Entry) deleted';
                 dialog_title = 'Edit Entry';
                 label = entity.entryLabel;
                 speech = htmlEscape(entity.entrySpeech);
@@ -456,10 +501,8 @@ function setPlaygroundBindings(){
                     window_markup.push('Speech:<br/>'+speech);
                 else
                     window_markup.push('Empty');
-                var input_label = $('#new_entry_labelI');
-                var ta_speech = $('#new_entry_speechI');
-                input_label.val(label);
-                ta_speech.val(speech);
+                var input_label = $('#new_entry_labelI').val(label);
+                var ta_speech = $('#new_entry_speechI').val(speech);
                 editF = function(){
                     entity.setLabel(input_label.val());
                     entity.setSpeech(ta_speech.val());
@@ -469,6 +512,7 @@ function setPlaygroundBindings(){
                 }
                 break;
             case "Reply":
+                delete_msg = '"'+entity.replyLabel+'" (Reply) deleted';
                 dialog_title = 'Edit Reply';
                 label = entity.replyLabel;
                 speech = htmlEscape(entity.replySpeech);
@@ -479,13 +523,11 @@ function setPlaygroundBindings(){
                     window_markup.push('Speech:<br/>'+speech);
                 else
                     window_markup.push('Empty');
-                var input_label = $('#new_reply_labelI');
-                var ta_speech = $('#new_reply_speechI');
-                var ta_cond = $('#new_reply_condI');
-                input_label.val(label);
-                ta_speech.val(speech);
-                if(cond)
-                    ta_cond.val(cond);
+                var input_label = $('#new_reply_labelI').val(label);
+                var ta_speech = $('#new_reply_speechI').val(speech);
+                var ta_cond = $('#new_reply_condI').val(cond);
+                ///////////if(cond)
+                    ///////////////////////////////ta_cond.val(cond);
                 editF = function(){
                     entity.setLabel(input_label.val());
                     entity.setSpeech(ta_speech.val());
@@ -498,18 +540,41 @@ function setPlaygroundBindings(){
         }
         //floater.hide().css('top', triggerer_pos.top+height-5).css('left', triggerer_pos.left+width-5).fadeIn(100);
         floater.hide().css('top', ev.pageY+10).css('left', ev.pageX+10).fadeIn(100);
-        floater.find('.edit').unbind();
+        var edit_icon = floater.find('.edit').unbind();
         if(isFu(editF))
-            floater.find('.edit').click(function(){
-                open_dialog(dialog_title, editF);
+            edit_icon.show().click(function(){
                 blur_context();
+                open_dialog(dialog_title, editF);
             });
+        else
+            edit_icon.hide();
+        if(simple_path.length!=3) // Not Board's first Entry
+            floater.find('.delete').show().unbind().click(function(){
+                blur_context();
+                alert('Are you sure? <br/><div class="warning reg">Will delete all child nodes as well!</div>', function(){ //On OK
+                    var toDeletePathMark = parseInt(simple_path.splice(simple_path.length-1, 1));
+                    var leadingTo = getEntityBySimplePath(simple_path);
+                    switch (leadingTo.constructor.name){
+                        case "Reply":
+                            leadingTo.setLeadsTo(null);
+                            break;
+                        case "Action":
+                            leadingTo.setLeadsTo(null);
+                            break;
+                        case "Entry": // Father is Entry, meaning deleting reply
+                            leadingTo.replies.splice(toDeletePathMark, 1);
+                            break;
+                    }
+                    cl(delete_msg);
+                    close_dialog(); redraw();
+                });
+            });
+        else // First Entry, don't show delete tool
+            floater.find('.delete').hide();
         floater.find('.content').html(window_markup.join(''));
         floater.find('.title').html(entity_type);
         ev.preventDefault()
     });
-
-
 }
 
 function blur_context(){
@@ -544,36 +609,40 @@ function redraw(who){
     $('#floater').hide();
     if(1 || isUn(who)){ // All //For now
         var game = $('.playgrounds').html('');
-        var navBar = $('.loaded-boards-nav-list').html('');
         var tabs_element = $('#tabs').html('');
         var markup = [];
         var tabs = [];
         var dd;
-        var navBarMarkup = [];;
         for(var i in playgrounds){
             tabs.push('<li><a href="#playground_'+i+'" tab_number="'+i+'">'+playgrounds[i].playgroundTitle+'</a></li>');
             markup.push('<div class="playground" '+key+'="'+i+'">');
                 markup.push('<div class="boards">');
                     for(var b in boards = playgrounds[i].getBoards()){
                         markup.push('<div class="panel drawing_panel" '+key+'="'+b+'">');
-                            markup.push('<div class="board-title">');
-                                markup.push(boards[b].boardTitle);
+                            markup.push('<div class="board-tools">');
+                                markup.push('<a class="edit_board"><i class="fa fa-pencil link"></i></a>');
+                                markup.push('<a class="delete_board"><i class="fa fa-trash-o link"></i></a>');
                             markup.push('</div>');
+                            markup.push('<div class="board-title">');
+                                if(boards[b].boardType=='area')
+                                    markup.push('<i class="fa fa-tree" title="Area Board"></i> ');
+                                else
+                                    markup.push('<i class="fa fa-comments" title="Conversation Board"></i> ');
+                                markup.push(boards[b].boardTitle);
+                            markup.push('</div> ');
                             markup.push('<div class="panel-body drawing_board">');
                                 dd = recur_draw_entry(boards[b].interactionTree);
                                 markup.push(dd);
                             markup.push('</div>');
                         markup.push('</div>');
-                        navBarMarkup.push('<li><a href="#">'+boards[b].title+'</a></li>');
                     }
                 markup.push('</div>');
-                markup.push('<a class="newboard" href="#">New Board</a>');
+                markup.push('<a class="newboard">New Board</a>');
             markup.push('</div>');
         }
-        tabs.push('<li><a href="#" onclick="new_playground()">+</a></li>');
+        tabs.push('<li><a onclick="new_playground()">+</a></li>');
         tabs_element.html(tabs.join(''))
         game.append(markup.join(''));
-        navBar.append(navBarMarkup.join(''));
         setPlaygroundBindings();
     } else { // One board
         var dr_p = $('.drawing_panel['+key+'='+who+']');
@@ -590,12 +659,14 @@ function redraw(who){
 function save_game(){
     var playgrounds_json = mjs();
     var my_tmp_boards = { game_id: game_id, playgrounds: playgrounds_json};
+    indicator_manager('save_game', 'On');
     $.ajax({
         type: 'post',
         dataType: 'json',
         url: '/make/save_game',
         data: my_tmp_boards,
         success: function(result){
+            indicator_manager('save_game', 'Off');
             if(result.success)
                 cl('Saved');
             else
@@ -628,6 +699,7 @@ function load_playground(){
 
 
 function new_playground(){
+    resetActionboxValues();
     open_dialog('New Playground', function(){
         var settings = {
             playgroundTitle: $('#new_playground_titleI').val()
@@ -642,6 +714,15 @@ function new_playground(){
         }
     });
 }
+
+$(document).keyup(function(e) {
+    switch(e.which){
+        case 27: // Escape
+            blur_context();
+            close_dialog();
+            break;
+    }
+});
 
 // Document Ready
 $(document).ready(function(){
@@ -756,3 +837,33 @@ function htmlEscape(str) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 }
+
+
+/*
+
+ Key	Code
+ backspace	8
+ tab	9
+ enter	13
+ shift	16
+ ctrl	17
+ alt	18
+ pause/break	19
+ caps lock	20
+ escape	27
+ page up	33
+ page down	34
+ end	35
+ home	36
+ left arrow	37
+ up arrow	38
+ right arrow	39
+ down arrow	40
+ insert	45
+ delete	46
+ 0	48
+ 1	49
+ 2	50
+ 3	51
+
+ */

@@ -4,7 +4,10 @@
 
 var Tmed = 500;
 var my_games_loaded = false;
+
+
 $(document).ready(function(){
+    $('#new_entry_labelI').on('focus', function(){ this.select(); });
     $('.my_games_link').unbind().click(loadGameList);
     $('#konssl .x').click(function(){$('#konssl').fadeOut()})
     $('#fire_signup').click(function(){
@@ -15,21 +18,23 @@ $(document).ready(function(){
                 email: $('#signup_email').val()
             }
             if(settings.username && settings.password){
-                var fail = function(){ alert('Signup Failed, please report to Ben if trying again doesn\'t help (Maybe even a full refresh)') };
-                $.ajax({
-                    type: 'post',
-                    dataType: 'json',
-                    url: '/users/signup',
-                    data: settings,
-                    success: function(result){
-                        if(result.success){
-                            setActionBoxOk(close_dialog);
-                            show_msg('Success!<br /><br />You may log in');
-                        }
-                        else
-                            fail()
-                    },
-                    error: fail
+                var fail = function(){ alert('Signup Failed, please report to Ben if trying again doesn\'t help (Maybe even a refresh?)') };
+                show_msg('<i class="fa fa-spinner fa-pulse"></i> Working...', function(){
+                    $.ajax({
+                        type: 'post',
+                        dataType: 'json',
+                        url: '/users/signup',
+                        data: settings,
+                        success: function(result){
+                            if(result.success){
+                                setActionBoxOk(close_dialog);
+                                show_msg('Success!<br /><br />You may log in');
+                            }
+                            else
+                                fail()
+                        },
+                        error: fail
+                    });
                 });
             }
         })
@@ -42,7 +47,7 @@ $(document).ready(function(){
             rm: $('#loginrm:checked').length==1
         }
         if(settings.username && settings.password){
-            jthat.html('Working...');
+            jthat.html('<i class="fa fa-spinner fa-pulse"></i> Working...');
             $.ajax({
                 type: 'post',
                 dataType: 'json',
@@ -63,9 +68,25 @@ $(document).ready(function(){
 
     $('#action_box_id .bottom-bar .cancel').click(close_dialog);
 });
+
+var indicator_manager = function(who, onoff){
+    switch (who){
+        case 'save_game':
+            if(onoff && onoff.toLowerCase()!='off'){ // On
+                $('#save_game').css('cursor', 'wait');
+                $('#save_game_loader').fadeIn(200).css("display","inline-block");
+            }
+            else{
+                $('#save_game').css('cursor', 'pointer');
+                $('#save_game_loader').fadeOut(200);
+            }
+            break;
+    }
+}
+
 var loadGameList = function(){
     if(!my_games_loaded){
-        $('#games_list').html('<li class="dropdown-header" style="font-size: 16px;">Loading...</li>');
+        $('#games_list').html('<li class="dropdown-header" style="font-size: 16px;"><i class="fa fa-spinner fa-pulse"></i> Loading...</li>');
         $.ajax({
             type: 'get',
             url: '/make/my-games',
@@ -78,13 +99,14 @@ var loadGameList = function(){
     }
 }
 var newGame = function(){
+    resetActionboxValues();
     open_dialog('New Game', function(){
         var settings = {
             title: $('#new_game_titleI').val(),
             teaser: $('#new_game_teaserI').val()
         }
         if(settings.title)
-            show_msg('Working...', function(){
+            show_msg('<i class="fa fa-spinner fa-pulse"></i> Working...', function(){
                 $.ajax({
                     type: 'post',
                     dataType: 'json',
@@ -117,6 +139,7 @@ function open_dialog(dialog, okFunction){
         'New Playground': 'playground-form-wrapper',
         'Edit Entry': 'entry-form-wrapper',
         'Edit Reply': 'reply-form-wrapper',
+        'Edit Board': 'board-form-wrapper',
         'Sign Up': 'signup-form-wrapper',
         'msg': 'msg'
     };
@@ -124,8 +147,13 @@ function open_dialog(dialog, okFunction){
     var form_wrapper_div = $('.'+dialogs[dialog], box_div);
     var bottom_bar_div = $('.bottom-bar', box_div);
     var cancel_div = $('.bottom-bar .cancel', box_div);
-    if(dialog!='msg')
-    $('.top-bar', box_div).html('<div>'+dialog+'</div>');
+    if(dialog!='msg'){
+        $('.msg', box_div).hide();
+        $('.top-bar', box_div).html('<div>'+dialog+'</div>');
+        $('.wrappers-wrapper').show();
+    }
+    else
+        $('.wrappers-wrapper').hide();
     form_wrapper_div.hide(); bottom_bar_div.show(); cancel_div.show().css('opacity',1);
     box_div.fadeIn(Tmed, function(){
         $('.wrappers-wrapper>div').fadeOut();
@@ -163,7 +191,7 @@ function close_dialog(msg, cb, cbparams){
     var msg_div = $('.msg', box_div);
     var cont_div = $('.fw:visible', box_div);
     if(box_div.is(":visible")){
-        $('#action_box_id input:not([type=radio]), #action_box_id textarea').val('');
+        resetActionboxValues();
         if(msg && isSt(msg)){
             show_msg(msg, function(){
                 setTimeout(function(){
@@ -182,6 +210,15 @@ function close_dialog(msg, cb, cbparams){
     }
 }
 
+
+var resetActionboxValues = function(who){
+    if(who || !who){
+        $('#action_box_id input:not([type=radio]), #action_box_id textarea').val('');
+        $('input[name=new_board_type][value=con]').prop('checked', true);
+        $('input[name=new_action_effect][value=redirect]').prop('checked', true);
+    }
+}
+
 function setActionBoxOk(func){
     var ok = $('#action_box_id .ok').unbind();
     if(isFu(func))
@@ -196,7 +233,7 @@ function isSt(o){ return typeof (o)=='string'; }
 function isOb(o){ return typeof (o)=='object'; }
 function isFu(o){ return typeof (o)=='function'; }
 function mjs(){ return JSON.stringify(playgrounds); }
-function cl(c){ eureka($('.text', $('#konssl').fadeIn()).prepend('<div><div class="cont">'+c+'</div><div class="time">'+getShortTime()+'</div><div class="clr"></div></div>')) };
+function cl(c){ eureka($('.text', $('#konssl').fadeIn()).prepend('<div><div class="cont">'+c+'</div><div class="time">'+getShortTime()+'</div><div class="clr"></div></div>').scrollTop(0)) };
 
 
 var getShortTime = function(){
@@ -221,10 +258,10 @@ function eureka(jQuery_str, box){
 
 
 // Override alert!
-alert = function(v) {
+alert = function(v, cb) {
     var box_div = $('#action_box_id');
     $('.top-bar', box_div).html('<div>Info</div>');
     $('.msg', box_div).html(v);
-    open_dialog('msg', close_dialog);
+    open_dialog('msg', (isFu(cb) ? cb : close_dialog));
 }
 

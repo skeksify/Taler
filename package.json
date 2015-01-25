@@ -1,6 +1,6 @@
 {
   "name": "Taler",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Online Gaming Environment to Create and Play Text-Based Web Role Playing Games",
   "main": "index.js",
   "engines": {

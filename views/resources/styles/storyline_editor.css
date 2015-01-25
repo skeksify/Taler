@@ -24,16 +24,38 @@ input[type=text]{
 .drawing_panel {
     background-color: #262626;
     border: 1px solid rgb(77, 77, 77);
-    padding: 0 20px 20px;
+    padding: 20px;
     overflow: auto;
 }
 
 .board-title{
     font-size: 30px;
-    color: #444444;
-    padding: 15px;
+    color: rgb(100, 100, 100);
+    padding: 0 15px 15px;
 }
 
+.board-title i {
+    padding: 0 5px 0 0;
+    opacity: 0.3;
+}
+
+.board-tools {
+    float: right;
+}
+
+.board-tools a {
+    padding: 0 0 0 10px;
+}
+
+i.fa.link {
+    color: #646464;
+    cursor: pointer;
+}
+
+a:hover i.fa.link {
+    text-shadow: 0px 0px 12px rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
 .drawing_board {
     border-collapse: collapse;
     display: table;
@@ -165,22 +187,25 @@ input[type=text]{
     padding: 10px;
     text-align: right;
     font-size: 16px;
+    border-bottom: 1px solid rgb(0, 0, 0);
 }
 
 #floater .top-bar div{
     display: inline-block;
-    cursor: pointer;
 }
 
+#floater .top-bar div.edit{
+    padding: 0 8px;
+}
 #floater .top-bar div:hover{
-    text-decoration: underline;
-    color: #FFFFCC;
+    /*text-decoration: underline;
+    color: #FFFFCC;*/
 }
 
 #floater .top-bar .title{
     float: left;
-    font-size: 14px;
-    text-decoration: underline;
+    font-size: 18px;
+    text-decoration: none;
 }
 #floater .content {
     padding: 10px;

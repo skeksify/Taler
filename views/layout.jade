@@ -16,6 +16,7 @@ html(lang='en')
         link(href='/rs/bootstrap.min.css', rel='stylesheet')
         link(href='/rs/bootstrap-theme.min.css', rel='stylesheet')
         link(href='/rs/extra_styles1.css', rel='stylesheet')
+        link(href='/rs/fa/css/font-awesome.min.css', rel='stylesheet')
         link(href='https://fonts.googleapis.com/css?family=IM+Fell+DW+Pica+SC|Ubuntu', rel='stylesheet', type='text/css')
         title
             ='Taler'+(page_title?' - '+page_title:'')
@@ -40,7 +41,11 @@ html(lang='en')
                                         li.dropdown-header Loading...
                                 if page=='storyline_editor' && game
                                     li
-                                        a#save_game Save Game
+                                        a#save_game
+                                            // i.fa.fa-save
+                                            | Save Game
+                                            #save_game_loader
+                                                i.fa.fa-spinner.fa-pulse
                             li.login
                                 include ./login.jade
                             if page=='storyline_editor'
