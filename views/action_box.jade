@@ -5,14 +5,14 @@
     .wrappers-wrapper
         .confirm-wrapper.fw
             | Are you sure?
-        .playground-form-wrapper.fw
+        .chapter-form-wrapper.fw
             form(role='form')
                 fieldset
                     // Text input
                     .control-group
-                        label.control-label(for='new_playground_titleI') Title:
+                        label.control-label(for='new_chapter_titleI') Title:
                         .controls
-                            input#new_playground_titleI.form-control(type='text')
+                            input#new_chapter_titleI.form-control(type='text')
         .game-form-wrapper.fw
             form(role='form')
                 fieldset
@@ -37,20 +37,44 @@
                         .radios-wrapper
                             label.radio(for='actionEff-3')
                                 input#actionEff-3(type='radio', name='new_action_effect', value='redirect', checked='checked')
-                                |                                                                 Redirect:
+                                | Redirect:
                                 #TargetEntryButton.btn Target Entry
                                 input#target_entry_path(type='hidden', value='')
                             label.radio(for='actionEff-0')
-                                input#actionEff-0(type='radio', name='new_action_effect', value='turnOnFlag')
-                                |                                                                 Turn On Flag:
-                                input#new_action_flag_nameI.form-control(type='text', placeholder='Flag Name')
+                                input#actionEff-0(type='radio', name='new_action_effect', value='flag_on')
+                                | Turn On Flag:
+                                .flag_text_holder
+                                    input#new_action_flag_nameI.form-control(type='text', placeholder='Flag Name')
+                                    input#new_action_flag_icon.form-control(type='hidden', value='')
+                                    a#flag_icon_selector
+                                        i.fa.fa-key.link
+                                    #flag_icon_menu
+                                        a
+                                            i.fa.fa-key.link
+                                        a
+                                            i.fa.fa-diamond.link
+                                        a
+                                            i.fa.fa-bug.link
+                                        a
+                                            i.fa.fa-flask.link
+                                        a
+                                            i.fa.fa-gavel.link
+                                        a
+                                            i.fa.fa-leaf.link
+                                        a
+                                            i.fa.fa-magic.link
+                                        a
+                                            i.fa.fa-trophy.link
+                                        a
+                                            i.fa.fa-fire.link
                             label.radio(for='actionEff-1')
-                                input#actionEff-1(type='radio', name='new_action_effect', value='turnOffFlag')
-                                |                                                                 Turn Off Flag:
+                                input#actionEff-1(type='radio', name='new_action_effect', value='flag_off')
+                                | Turn Off Flag:
                                 input#new_action_flag_nameII.form-control(type='text', placeholder='Flag Name')
-                            label.radio(for='actionEff-2')
-                                input#actionEff-2(type='radio', name='new_action_effect', value='kill')
-                                |                                                                 Kill Char
+                            if 0
+                                label.radio(for='actionEff-2')
+                                    input#actionEff-2(type='radio', name='new_action_effect', value='kill')
+                                    | Kill Char
         .entry-form-wrapper.fw
             form(role='form')
                 fieldset
@@ -60,12 +84,13 @@
                         .controls
                             input#new_entry_labelI.form-control(type='text', placeholder='Personal Use')
                         br
-                        label.control-label(for='new_entry_speechI') Speech:
+                        label.control-label(for='new_entry_speechI') Description:
                         .controls
                             textarea#new_entry_speechI.form-control
-                        br
-                        .pick-image
-                            .btn Image
+                        if 0
+                            br
+                            .pick-image
+                                .btn Image
         .reply-form-wrapper.fw
             form(role='form')
                 fieldset
@@ -73,11 +98,12 @@
                     .control-group
                         label.control-label(for='new_reply_labelI') Label:
                         .controls
-                            input#new_reply_labelI.form-control(type='text', placeholder='Personal Use', required='')
-                        br
-                        label.control-label(for='new_reply_speechI') Speech:
-                        .controls
-                            textarea#new_reply_speechI.form-control.speech(required='')
+                            textarea#new_reply_labelI.form-control(type='text', required='')
+                        .hidden
+                            br
+                            label.control-label(for='new_reply_speechI') Speech:
+                            .controls
+                                textarea#new_reply_speechI.form-control.speech(required='')
                         br
                         label.control-label(for='new_reply_condI') Condition:
                         .controls
@@ -98,6 +124,7 @@
                         label.control-label(for='signup_email') E-Mail:
                         .controls
                             input#signup_email.form-control(type='text', placeholder='', required='')
+                        .signup-error-message
         .board-form-wrapper.fw
             form(role='form')
                 fieldset
@@ -114,10 +141,12 @@
                             label.radio-inline(for='bType-1')
                                 input#bType-1(type='radio', name='new_board_type', value='area')
                                 | Area
-                        br
-                        label.control-label(for='new_board_descI') Description:
-                        .controls
-                            textarea#new_board_descI.form-control.speech(required='')
+
+                        .hidden
+                            br
+                            label.control-label(for='new_board_descI') Description:
+                            .controls
+                                textarea#new_board_descI.form-control.speech(required='')
                         input#board_image(type='hidden', value='')
 
 

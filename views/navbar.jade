@@ -1,0 +1,68 @@
+// Fixed navbar
+nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
+    .container
+        #navbar.navbar-collapse
+            ul.nav.navbar-nav
+                li(class=(page=='home'?'active':''))
+                    a(href='/') Home
+                if loggedin
+                    if 0
+                        li(class=(page=='create_character'?'active':''))
+                            a(href='/game/create_character') Create Character
+                    li.dropdown
+                        a.dropdown-toggle.my_games_link(data-toggle='dropdown', role='button', aria-expanded='false')
+                            | My Games
+                            span.caret
+                        ul.dropdown-menu.loaded-boards-nav-list(role='menu')#games_list
+                            li.dropdown-header Loading...
+                    if page=='storyline_editor' && game
+                        li.dropdown
+                            a.dropdown-toggle(data-toggle='dropdown', role='button', aria-expanded='false')
+                                | Tools
+                                span.caret
+                            ul.dropdown-menu(role='menu')#tools_list
+                                li
+                                    a.preview_game Preview Game
+                                li.divider
+                                li#cutncopy
+                                    a Cut/Copy
+                                li#cnppaste
+                                    a Paste
+                                li#cnpclear
+                                    a Clear Clipboard
+                                li.divider
+                                li#shleg
+                                    a
+                                        i.fa.fa-check
+                                        | Legend
+                                if game.tutorial
+                                    li#shtut
+                                        a
+                                            i.fa.fa-check
+                                            | Tutorials
+                li.login.r
+                    include ./login.jade
+
+if page=='storyline_editor'
+    nav#navbar-bot.navbar.navbar-inverse.navbar-fixed-bottom
+        .container
+            .navbar-collapse
+                ul.nav.navbar-nav
+                    li.r
+                        #menunc
+                            | No Unsaved Changes
+                        #unsaved_changes_list
+                            .uscl
+                                #save_game_loader
+                                    i.fa.fa-spinner.fa-pulse
+                                | Unsaved Changes:
+                            a#save_game
+                                i.fa.fa-save.link
+                            a#load_game
+                                i.fa.fa-trash-o.link
+                    li#konssl
+                        .log-bar
+                            if 0
+                                .x
+                                    a.reg(style='color:white;') X
+                            .text.reg

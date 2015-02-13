@@ -1,3 +1,7 @@
+.waiter {
+    cursor: wait;
+}
+
 a {
     cursor: pointer;
 }
@@ -10,8 +14,6 @@ body {
     background: #222;
     color: rgb(239, 244, 229);
     font-family: 'IM Fell DW Pica SC', serif;
-    padding-top: 70px;
-    padding-bottom: 30px;
     font-size: 20px;
     font-variant: small-caps;
 }
@@ -28,6 +30,8 @@ body {
 .main_wrapper {
     margin: auto;
     width: 65%;
+    padding-top: 70px;
+    padding-bottom: 70px;
 }
 
 .main_wrapper .game_title{
@@ -91,8 +95,19 @@ body {
     padding-bottom: 30px; /* 30 for Abs Bottom Bar, 15 for space anyway */
     z-index: 50;
 }
+
 .action-box .fw{
     display: none;
+}
+
+.action-box .flag_text_holder{
+    position: relative;
+}
+
+.action-box .flag_text_holder a{
+    position: absolute;
+    top: 5px;
+    right: 10px;
 }
 
 .action-box .top-bar {
@@ -159,6 +174,11 @@ body {
 .action-box .warning{
     font-size: 14px;
 }
+.action-box .signup-error-message{
+    text-align: center;
+    font-size: 14px;
+}
+
 .form-control {
     font-family: Ubuntu;
     font-variant: normal;
@@ -180,7 +200,7 @@ body {
     width: 100%;
 }
 
-#navbar li.login {
+.navbar li.r {
     float: right;
 }
 
@@ -218,10 +238,20 @@ body {
     margin: 10px;
     border-color: rgb(51, 51, 51);
 }
+#shtut, #shleg {
+    position: relative;
+}
 
+#shtut i, #shleg i {
+    display: none;
+    position: absolute;
+    left: 4px;
+    top: 6px;
+    font-size: 12px;
+}
 
 .yellowBoxShadow{
-    box-shadow: 0px 0px 13px rgb(255, 255, 0);
+    box-shadow: 0px 0px 20px rgb(255, 255, 0);
 }
 .fadeOutBoxShadow {
     transition: box-shadow 2200ms;
@@ -240,25 +270,36 @@ body {
 
 #konssl {
     display: none;
-    float: right;
-    line-height: 50px;
+    line-height: 30px;
     margin: 0 25px;
+    max-height: 30px;
 }
 
-#konssl .log-bar {}
+#konssl .log-bar {
+    position: relative;
+}
 
 #konssl .log-bar .text{
-    line-height: 16px;
+    line-height: 30px;
     font-size: 14px;
     vertical-align: bottom;
-    margin: 10px 0;
+    margin: 0px 0;
     border: 0px solid rgb(34, 34, 34);
-    padding: 2px 25px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 9px rgb(33, 33, 33) inset;
+    border-radius: 0px;
+    overflow: hidden;
+    min-height: 30px;
+    max-height: 30px;
+    width: 500px;
+    padding: 0px 10px 0px 25px;
+}
+
+#konssl .log-bar .text.open {
+    max-height: 300px;
+    position: absolute;
+    bottom: -30px;
     overflow: auto;
-    height: 30px;
-    width: 450px;
+    background-color: #333;
+    box-shadow: 0px 0px 9px rgb(33, 33, 33) inset;
 }
 
 #konssl .log-bar .x{
@@ -287,4 +328,124 @@ body {
 div#save_game_loader {
     display: none;
     margin: 0 0 0 15px;
+}
+
+.trip-block {
+    font-family: Ubuntu;
+    font-variant: normal;
+    font-size: 16px;
+    /*max-width: 570px;*/
+}
+
+.trip-block .x{
+    position: absolute;
+    right: 3px;
+    top: 0px;
+}
+.trip-block .l{
+    text-align: left;
+}
+
+.trip-block .c{
+    text-align: center;
+}
+.trip-block .next {
+    display: inline-block;
+    margin: 0 10px;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+
+.trip-block p {
+    display: inline-block;
+    margin: 0;
+}
+
+.trip-block p.b{
+    font-weight: bold;
+}
+
+.trip-block p.i{
+    font-style: italic;
+}
+
+.trip-block p.u{
+    text-decoration: underline;
+}
+
+#flag_icon_menu {
+    display: none;
+    position: absolute;
+    height: 135px;
+    width: 115px;
+    right: -125px;
+    background: rgb(51, 51, 51);
+    padding: 10px;
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 5px;
+    top: 0;
+}
+#flag_icon_menu a{
+    width: 30px;
+    float: left;
+    padding: 5px;
+    position: static;
+}
+#flag_icon_menu i.fa.link{
+    color: #eee;
+}
+
+#unsaved_changes_list {
+    display: none;
+}
+
+#menunc{
+    line-height: 30px;
+    font-size: 12px;
+    color: rgb(100, 100, 100);
+    padding: 0 0 0 5px;
+}
+
+#unsaved_changes_list>* {
+    vertical-align: middle;
+}
+
+#unsaved_changes_list {
+    line-height: 30px;
+    padding: 0 0 0 5px;
+    font-size: 16px;
+}
+
+#unsaved_changes_list a{
+    padding: 0 5px;
+    font-size: 20px;
+}
+
+#unsaved_changes_list a i.fa.link{
+    color: rgb(200, 200, 200);
+}
+
+#unsaved_changes_list .uscl{
+    display: inline-block;
+    margin: 0 5px 0 0;
+}
+
+#navbar-bot {
+    height: 30px;
+    min-height: initial;
+    line-height: 20px;
+}
+
+
+#navbar-bot a{
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 30px;
+    font-size: 16px;
+}
+
+.no-events {
+    pointer-events: none;
 }

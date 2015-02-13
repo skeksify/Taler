@@ -47,7 +47,7 @@ exports.saveGame = function(data, callback){
         if(e)
             callback(e)
         else{
-            res.playgrounds = JSON.parse(data.playgrounds);
+            res.chapters = JSON.parse(data.chapters);
             games.save(res, {safe: true}, function(err){
                 if (err)
                     callback(err);
@@ -77,13 +77,32 @@ exports.getGames = function(user_id, callback){
         });
 }
 
-exports.createNewGame = function(new_game, callback){
+function new_game(new_game, callback){
     new_game.date = moment().format('MMMM Do YYYY, h:mm:ss a');
     games.insert(new_game, {safe: true}, callback);
 }
 
+exports.createNewGame = new_game;
+
+exports.activateAccount = function(user_id, pass, callback){
+    var rev_pass = pass.split('').reverse().join('');
+    accounts.findOne({_id:oId(user_id), pass: rev_pass}, function(e, o) {
+        if (o){
+            o.active = true;
+            accounts.save(o, {safe: true}, function(err){
+                if(err)
+                    console.error(err);
+                else // Success
+                    callback(null, o);
+            });
+        }
+        else
+            callback(null);
+    });
+}
+
 exports.autoLogin = function(user, pass, callback){
-    accounts.findOne({user:user}, function(e, o) {
+    accounts.findOne({user:user, active: true}, function(e, o) {
         if (o)
             o.pass == pass ? callback(o) : callback(null);
         else
@@ -95,14 +114,16 @@ exports.manualLogin = function(user, pass, callback){
     accounts.findOne({user:user}, function(e, o) {
         if (o == null){
             callback('user-not-found');
-        }	else{
-            validatePassword(pass, o.pass, function(err, res) {
-                if (res){
-                    callback(null, o);
-                }	else{
-                    callback('invalid-password');
-                }
-            });
+        } else {
+            if(!o.active)
+                callback('user-inactive')
+            else
+                validatePassword(pass, o.pass, function(err, res) {
+                    if (res)
+                        callback(null, o);
+                    else
+                        callback('invalid-password');
+                });
         }
     });
 }
@@ -120,7 +141,27 @@ exports.addNewAccount = function(newData, callback){
                         newData.pass = hash;
                         // append date stamp when record was created //
                         newData.date = moment().format('MMMM Do YYYY, h:mm:ss a');
-                        accounts.insert(newData, {safe: true}, callback);
+                        newData.active = false;
+                        accounts.insert(newData, {safe: true}, function(){
+                            games.findOne({_id: oId('54d51374dd14e7d85f7cb776')}, function(e, res) {
+                                if(e)
+                                    callback('Tutorial creation error')
+                                else{
+                                    var tutorial = {
+                                        title 	: 'Game Creation Tutorials',
+                                        teaser 	: 'Learn how to use Tale Maker!',
+                                        owner	: newData._id.toString(),
+                                        chapters: res.chapters,
+                                        tutorial: true
+                                    };
+                                    console.log('About to insert:');
+                                    console.log(tutorial);
+                                    new_game(tutorial, function(){
+                                        callback(null, {user: newData._id, hash: hash.split('').reverse().join('')});
+                                    })
+                                }
+                            });
+                        });
                     });
                 }
             });

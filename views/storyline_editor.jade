@@ -4,16 +4,50 @@ block content
     script
         != ('var game_id = "'+game._id+'";')
         | $(document).ready(function(){
-        if game.playgrounds
-            != ('recompilePlaygrounds('+JSON.stringify(game.playgrounds)+');')
+        != ('loadThis('+(game.chapters?JSON.stringify(game.chapters):'')+');')
+        if game.tutorial
+            | new game_preview();
         | redraw();
         | });
     link(href='/rs/storyline_editor.css', rel='stylesheet')
+    #legend.reg
+        .title
+            | Legend <br/><br/>
+        .entryLabel Entry
+        <br/>
+        .replyLabel Option
+        <br/>
+        .actionLabel Action
+        <br/>
+    if game.tutorial
+        #tutorials.reg
+            .title Tutorials
+            a(onclick="tc.start('terminology')") Game Structure
+            i.fa.fa-check#tut_1
+            | <br />
+            a(onclick="tc.start('workspace')") Workspace
+            i.fa.fa-check#tut_2
+            | <br />
+            a(onclick="tc.start('entries_options')") Editing Elements
+            i.fa.fa-check#tut_3
+            | <br />
+            a(onclick="tc.start('new_entries_options')") Adding Elements
+            i.fa.fa-check#tut_4
+            | <br />
+    #game_preview
+        .wrapper
+            .flag_indication
+            .closer.reg X
+            .entry
+            .options
     .game_title
         = game.title
     #floater
         .top-bar
             .title
+            .play_from_here
+                a
+                    i.fa.fa-play.link
             .edit
                 a
                     i.fa.fa-pencil.link
@@ -23,7 +57,7 @@ block content
         .content
     .game
         ul#tabs
-        .playgrounds
+        .chapters
 block scripts
     // script(type='text/javascript', src='/rj/jquery.jsPlumb-1.7.2-min.js')
     script(type='text/javascript', src='/rj/storyline_editor.js')

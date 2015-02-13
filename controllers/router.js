@@ -4,6 +4,7 @@ var EM = require('./modules/email-dispatcher');
 */
 
 var AM = require('../modules/account-manager');
+var mailer = require('../modules/mailer');
 var multer = require('multer');
 var file_upload_done = false;
 
@@ -79,7 +80,7 @@ module.exports = function(app) {
 
     app.post('/make/save_game', function(req, res){
         if(logged(req))
-            AM.saveGame({_id: req.param('game_id'), owner: req.session.user._id , playgrounds: req.param('playgrounds')}, function(e){
+            AM.saveGame({_id: req.param('game_id'), owner: req.session.user._id , chapters: req.param('chapters')}, function(e){
                 if (e)
                     res.json({ success: false, error: e});
                 else
@@ -129,20 +130,38 @@ module.exports = function(app) {
         });
     });
 
+    app.get(/^\/users\/activate\/(.+)\/(.+)$/, function(req, res){
+        var paramies = req.params;
+        AM.activateAccount(paramies[0], paramies[1], function(e, o){
+            if(e)
+                res.redirect('/')
+            else{
+                req.session.user = o;
+                res.redirect('/home');
+            }
+        })
+    });
+
     app.post('/users/signup', function(req, res){
         AM.addNewAccount({
             email 	: req.param('email'),
             user 	: req.param('username'),
             pass	: req.param('password')
-        }, function(e) {
+        }, function(e, uh) {
             if (e)
                 res.json({ success: false, error: e});
-            else
+            else{
+                mailer.mail({
+                    to: req.param('email'),
+                    subject: 'Tale-Maker: Activate your account',
+                    body: '<h3 style="font-family: verdana;">Tale-Maker Signup</h3>Go to the following link to activate your account<br><br><a href="http://taler.herokuapp.com/users/activate/'+uh.user+'/'+uh.hash+'">Activate</a>'
+                });
                 res.json({ success: true });
+            }
         });
     });
 
-    app.get( '/game/create_character', function(req, res){
+    app.get( '/play/create_character', function(req, res){
         if(logged(req))
             res.render('create_character', add_flavors({
                 page: 'create_character',
@@ -156,7 +175,7 @@ module.exports = function(app) {
         var paramies = req.params;
         switch(paramies[0]){
             case 'game':
-                if(paramies[1]=='save_playground'){
+                if(paramies[1]=='save_chapter'){
                     // Use a db object from above
                     res.send('{success: true}');
                 }

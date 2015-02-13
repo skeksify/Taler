@@ -2,7 +2,17 @@
 extends layout
 
 block content
-    | Welcome!
+    if !loggedin
+        div(style="text-align:center;")
+            | Welcome to Tale Maker! <br><br>
+            | Please Login or Sign Up to begin
+    else
+        | WELCOME! <br><br>
+        | In your hands now lies a tool named "Tale Maker"<br>
+        | It makes epic interactive text-based web games <br>
+        | It appears yet premature, but you suspect it might hold great potential <br><br>
+        | Something here eagerly recommends you to try out the tutorials... <br><br>
+        | Enjoy.
 
 
 block scripts

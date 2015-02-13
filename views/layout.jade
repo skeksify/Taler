@@ -8,52 +8,23 @@ html(lang='en')
         meta(name='description', content='Taler - Create your own game!')
         meta(name='author', content='Ben Haran')
         script(type='text/javascript', src='/rj/jquery-2.1.1.min.js')
-        // script type="text/javascript" src="/rj/underscore-min.js"></script
         script(type='text/javascript', src='/rj/bootstrap.min.js')
         script(type='text/javascript', src='/rj/jquery.animate-shadow-min.js')
         script(type='text/javascript', src='/rj/master-scripts.js')
         script(type='text/javascript', src='/rj/jquery.form.js')
+        script(type='text/javascript', src='/rj/trip.min.js')
         link(href='/rs/bootstrap.min.css', rel='stylesheet')
         link(href='/rs/bootstrap-theme.min.css', rel='stylesheet')
         link(href='/rs/extra_styles1.css', rel='stylesheet')
         link(href='/rs/fa/css/font-awesome.min.css', rel='stylesheet')
-        link(href='https://fonts.googleapis.com/css?family=IM+Fell+DW+Pica+SC|Ubuntu', rel='stylesheet', type='text/css')
+        link(href='/rs/trip.css', rel='stylesheet')
+        link(href='https://fonts.googleapis.com/css?family=IM+Fell+DW+Pica+SC|Ubuntu|Advent+Pro:100', rel='stylesheet', type='text/css')
         title
             ='Taler'+(page_title?' - '+page_title:'')
     body(role='document')
+        #overlay
         .main_wrapper
-            // Fixed navbar
-            nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
-                .container
-                    #navbar.navbar-collapse
-                        ul.nav.navbar-nav
-                            li(class=(page=='home'?'active':''))
-                                a(href='/') Home
-                            if loggedin
-                                if 0
-                                    li(class=(page=='create_character'?'active':''))
-                                        a(href='/game/create_character') Create Character
-                                li.dropdown
-                                    a.dropdown-toggle.my_games_link(href='#', data-toggle='dropdown', role='button', aria-expanded='false')
-                                        | My Games
-                                        span.caret
-                                    ul.dropdown-menu.loaded-boards-nav-list(role='menu')#games_list
-                                        li.dropdown-header Loading...
-                                if page=='storyline_editor' && game
-                                    li
-                                        a#save_game
-                                            // i.fa.fa-save
-                                            | Save Game
-                                            #save_game_loader
-                                                i.fa.fa-spinner.fa-pulse
-                            li.login
-                                include ./login.jade
-                            if page=='storyline_editor'
-                                li#konssl
-                                    .log-bar
-                                        .x
-                                            a.reg(style='color:white;') X
-                                        .text.reg
+            include ./navbar.jade
             include ./action_box.jade
             block content
 block scripts
