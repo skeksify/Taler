@@ -5,17 +5,19 @@ var Server 		= require('mongodb').Server;
 var oId         = require('mongodb').ObjectID;
 var moment 		= require('moment');
 
-var auth, dbPort, dbHost, dbName;
+var auth, dbPort, dbHost, dbName, tutorial_template_id;
 if(1) {
     dbPort 		= 53139;
     dbHost 		= 'ds053139.mongolab.com';
     dbName 		= 'taler';
     auth = true;
+    tutorial_template_id = '54ddc7c4a46b62030021198c';
 } else {
     dbPort 		= 27017;
     dbHost 		= 'localhost';
     dbName 		= 'Taler';
     auth = false;
+    tutorial_template_id='54d51374dd14e7d85f7cb776';
 }
 
 /* establish the database connection */
@@ -143,7 +145,7 @@ exports.addNewAccount = function(newData, callback){
                         newData.date = moment().format('MMMM Do YYYY, h:mm:ss a');
                         newData.active = false;
                         accounts.insert(newData, {safe: true}, function(){
-                            /*games.findOne({_id: oId('54d51374dd14e7d85f7cb776')}, function(e, res) {
+                            games.findOne({_id: oId(tutorial_template_id)}, function(e, res) {
                                 if(e)
                                     callback('Tutorial creation error')
                                 else {
@@ -156,11 +158,11 @@ exports.addNewAccount = function(newData, callback){
                                     };
                                     console.log('About to insert:');
                                     console.log(tutorial);
-                                    new_game(tutorial, function(){*/
+                                    new_game(tutorial, function(){
                                         callback(null, {user: newData._id, hash: hash.split('').reverse().join('')});
-                                    /*})
+                                    })
                                 }
-                            });*/
+                            });
                         });
                     });
                 }
