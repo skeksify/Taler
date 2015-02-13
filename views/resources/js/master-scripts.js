@@ -59,7 +59,7 @@ var tripController = function(params){
         tutorials_trip: [
             {
                 sel: $('#tutorials'),
-                content: 'Look here!',
+                content: 'Start here!',
                 position: 'e',
                 delay: 0+dt
             }

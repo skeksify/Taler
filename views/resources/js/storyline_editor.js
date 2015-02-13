@@ -274,7 +274,7 @@ function game_preview(start_from){
                     }
                     current_entry = result;
                     draw_entry();
-                } else $(this).after(' <span style="font-size:12px; vertical-align: middle;" class="reg">(Leads nowhere) </span>');
+                } else $(this).html(' <span style="font-size:12px; vertical-align: middle;" class="reg">(Leads nowhere) </span>');
             });
         })
     }
@@ -285,17 +285,17 @@ function game_preview(start_from){
         $('.flag_indication i').remove();
         panel.fadeIn(200, function(){
             draw_entry();
-            $(panel).click(function(e){
-                if($(e.currentTarget).attr('id')=='overlay')
-                    panel.fadeOut(200);
-            });
             $('.closer', panel).click(function(){
                 panel.fadeOut(200);
+                if(first_time){
+                    first_time = false;
+                    tc.start('tutorials');
+                }
             });
         });
     } else {} //Empty game
 }
-
+var first_time = 1;
 
 
 // Entity Helper Functions //
@@ -1088,12 +1088,6 @@ $(document).keyup(function(e) {
 $(document).ready(function(){
     resetTabs();
     makeTabs();
-
-    if(localStorage.getItem('settings')){
-
-    } else { //Didn't ask to hide
-        $('#legend')
-    }
 
     $('.preview_game').click(function(){
         new game_preview();
