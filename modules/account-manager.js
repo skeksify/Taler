@@ -143,10 +143,10 @@ exports.addNewAccount = function(newData, callback){
                         newData.date = moment().format('MMMM Do YYYY, h:mm:ss a');
                         newData.active = false;
                         accounts.insert(newData, {safe: true}, function(){
-                            games.findOne({_id: oId('54d51374dd14e7d85f7cb776')}, function(e, res) {
+                            /*games.findOne({_id: oId('54d51374dd14e7d85f7cb776')}, function(e, res) {
                                 if(e)
                                     callback('Tutorial creation error')
-                                else{
+                                else {
                                     var tutorial = {
                                         title 	: 'Game Creation Tutorials',
                                         teaser 	: 'Learn how to use Tale Maker!',
@@ -156,11 +156,11 @@ exports.addNewAccount = function(newData, callback){
                                     };
                                     console.log('About to insert:');
                                     console.log(tutorial);
-                                    new_game(tutorial, function(){
+                                    new_game(tutorial, function(){*/
                                         callback(null, {user: newData._id, hash: hash.split('').reverse().join('')});
-                                    })
+                                    /*})
                                 }
-                            });
+                            });*/
                         });
                     });
                 }
