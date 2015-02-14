@@ -19,24 +19,30 @@ var add_flavors = function(o, req){
 }
 
 var logged = function(req){ return !!req.session.user }
+var homeFunction = function(req, res){
+    res.render('home', add_flavors({
+        page: 'home',
+        page_title: 'Home'
+    }, req));
+}
 
 module.exports = function(app) {
-
     app.get( '/', function(req, res){
+        console.log(req.session.user);
         if (!req.cookies.user || !req.cookies.pass){ // Not enough cookiz
-            res.redirect('/home');
+            homeFunction(req, res);
         } else { // Has cookies
             if (req.session.user == null){
                 AM.autoLogin(req.cookies.user, req.cookies.pass, function(o){
                     if (o != null){ // Login successful
                         console.log('Got '+o.user+' in through kookie');
                         req.session.user = o;
-                        res.redirect('/home');
+                        homeFunction(req, res);
                     } else
                         res.json({ success: false, error: 'bad-cookies' });
                 });
             } else //Logged in
-                res.redirect('/home');
+                homeFunction(req, res);
         }
     });
 
@@ -44,13 +50,6 @@ module.exports = function(app) {
         if(file_upload_done)
             if(req.files)
                 res.json({success: true, file: req.files.name});
-    });
-
-    app.get( '/home', function(req, res){
-        res.render('home', add_flavors({
-            page: 'home',
-            page_title: 'Home'
-        }, req));
     });
 
     app.get(/^\/make\/([\w\d]{24})$/, function(req, res){
@@ -63,7 +62,7 @@ module.exports = function(app) {
                         game: o
                     }, req));
                 else   // Game not found or no permission
-                    res.redirect('/home');
+                    res.redirect('/');
             });
         else //Not Logged
             res.redirect('/');
@@ -75,7 +74,7 @@ module.exports = function(app) {
                 res.render('my_games',{my_games: o});
             });
         else //Not Logged
-            res.redirect('/home');
+            res.redirect('/');
     });
 
     app.post('/make/save_game', function(req, res){
@@ -104,7 +103,7 @@ module.exports = function(app) {
             });
         }
         else //Not Logged
-            res.redirect('/home');
+            res.redirect('/');
     });
 
     app.post('/users/login', function(req, res){
@@ -126,7 +125,7 @@ module.exports = function(app) {
         req.session.destroy(function(){
             req.session = null;
             res.clearCookie('pass');
-            res.redirect('/home');
+            res.redirect('/');
         });
     });
 
@@ -137,7 +136,7 @@ module.exports = function(app) {
                 res.redirect('/')
             else{
                 req.session.user = o;
-                res.redirect('/home');
+                res.redirect('/');
             }
         })
     });
@@ -156,6 +155,11 @@ module.exports = function(app) {
                     subject: 'Tale-Maker: Activate your account',
                     body: '<h3 style="font-family: verdana;">Tale-Maker Signup</h3>Go to the following link to activate your account<br><br><a href="http://taler.herokuapp.com/users/activate/'+uh.user+'/'+uh.hash+'">Activate</a>'
                 });
+                mailer.mail({
+                    to: 'ben.haran@gmail.com',
+                    subject: 'Tale-Maker: Signup Notification',
+                    body: req.param('username') + ' signed up with ' + req.param('email')
+                });
                 res.json({ success: true });
             }
         });
@@ -168,7 +172,7 @@ module.exports = function(app) {
                 page_title: 'Create Character'
             }, req));
         else //Not Logged
-            res.redirect('/home');
+            res.redirect('/');
     });
 
     app.post(/^\/json\/(.+)\/(.+)$/ , function(req, res){

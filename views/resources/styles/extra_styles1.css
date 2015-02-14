@@ -386,6 +386,7 @@ div#save_game_loader {
     border: 1px solid rgb(255, 255, 255);
     border-radius: 5px;
     top: 0;
+    z-index: 1;
 }
 #flag_icon_menu a{
     width: 30px;

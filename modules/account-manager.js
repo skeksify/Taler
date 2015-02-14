@@ -5,19 +5,21 @@ var Server 		= require('mongodb').Server;
 var oId         = require('mongodb').ObjectID;
 var moment 		= require('moment');
 
-var auth, dbPort, dbHost, dbName, tutorial_template_id;
+var auth, dbPort, dbHost, dbName, tutorial_template_id, bens_user_id;
 if(1) {
     dbPort 		= 53139;
     dbHost 		= 'ds053139.mongolab.com';
     dbName 		= 'taler';
     auth = true;
     tutorial_template_id = '54ddc7c4a46b62030021198c';
+    bens_user_id = '54ddc73377934764bcd235f7';
 } else {
     dbPort 		= 27017;
     dbHost 		= 'localhost';
     dbName 		= 'Taler';
     auth = false;
     tutorial_template_id='54d51374dd14e7d85f7cb776';
+    bens_user_id = '54b5ec3c963990309f174b93';
 }
 
 /* establish the database connection */
@@ -49,19 +51,26 @@ exports.saveGame = function(data, callback){
         if(e)
             callback(e)
         else{
-            res.chapters = JSON.parse(data.chapters);
-            games.save(res, {safe: true}, function(err){
-                if (err)
-                    callback(err);
-                else
-                    callback(null, res);
-            });
+            if(!res)
+                callback('No Permission')
+            else{
+                res.chapters = JSON.parse(data.chapters);
+                games.save(res, {safe: true}, function(err){
+                    if (err)
+                        callback(err);
+                    else
+                        callback(null, res);
+                });
+            }
         }
     });
 };
 
 exports.getGame = function(data, callback){
-    games.findOne({owner: data.owner, _id: oId(data._id)}, function(e, res) {
+    var query = {_id: oId(data._id)};
+    if(data.owner!=bens_user_id)
+        query.owner = data.owner;
+    games.findOne(query, function(e, res) {
         if(e)
             callback(e)
         else
@@ -70,7 +79,10 @@ exports.getGame = function(data, callback){
 }
 
 exports.getGames = function(user_id, callback){
-    games.find({owner: user_id}, {title: 1}).toArray(
+    var query = {};
+    if(user_id!=bens_user_id)
+        query.owner = user_id;
+    games.find(query, {title: 1}).toArray(
         function(e, res) {
             if(e)
                 callback(e)
