@@ -1,0 +1,138 @@
+body {
+    background-color: #000; /* For the background image opacity */
+}
+
+.background div {
+    background: url('../ri/def_theme/bg-pack/bg2.jpg');
+    background-size: cover;
+    background-color: rgb(51, 51, 51);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: -1;
+
+
+
+    opacity: 0.72;
+
+
+}
+
+.main_wrapper {
+    padding: 100px 0 50px;
+}
+
+.navbar-inverse:not(.navbar-fixed-bottom) .navbar-nav>li:not(.login, .home) {
+    background-image: url('../ri/def_theme/bullet.png');
+    background-position: 4px 14px;
+    background-repeat: no-repeat;
+    padding-left: 8px;
+}
+
+.navbar-inverse:not(.navbar-fixed-bottom) {
+    border: 0;
+    background: linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+    height: 160px;
+    padding: 22px 0 0;
+    z-index: 80;
+}
+
+.navbar-nav>li.home {
+    padding: 0px 72px 52px;
+    background-image: url('../ri/def_theme/logo-titlew.png');
+    background-position: bottom center;
+    background-repeat: no-repeat;
+}
+
+.navbar-nav>li.home>a {
+    padding: 0;
+    font-size: 24px;
+    color: rgb(235, 235, 235);
+}
+
+.navbar .active>a, #navbar .active>a, .navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover, .navbar-inverse .navbar-nav>.open>a:focus {
+    background-image: initial;
+}
+
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+
+.navbar-inverse.navbar-fixed-bottom{
+    border: 0;
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+}
+
+.drawing_panel {
+    background-color: transparent;
+    background-image: url('../ri/def_theme/interaction_box.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    border: 0;
+    height: 600px;
+    width: 1200px;
+    margin: 10px auto 40px;
+    padding: 35px 60px;
+    overflow: auto;
+}
+
+.game .chapter {
+    border: 0px groove #fff;
+}
+
+.game .game_title{
+    color: rgb(240, 240, 240);
+}
+
+.board-scroller {
+    width: 1100px;
+    max-height: 470px;
+}
+
+#tabs .atab {
+    border-bottom-color: rgba(205, 205, 205, 0.25);
+}
+
+#tabs a:hover, #tabs a:focus {
+    border-bottom-color: rgba(51, 122, 183, 0.25);
+}
+
+#konssl .log-bar .text.open, #games_list {
+    background-color: rgba(0, 0, 0, 0.54);
+    box-shadow: 0 0 104px rgb(0, 0, 0) inset;
+    border-radius: 5px;
+}
+#games_list, #tools_list {
+    background-color: rgba(0, 0, 0, 0.68)!important;
+}
+
+/* Let's get this party started */
+::-webkit-scrollbar {
+    width: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: url('../ri/def_theme/scr-track.png');
+    background-repeat: repeat-y;
+    background-position: center center;
+}
+
+/* Handle */
+::-webkit-scrollbar-button {
+    background-color: rgba(0,0,0,0.0);
+    background-size: cover;
+}
+
+::-webkit-scrollbar-thumb {
+    background: url('../ri/def_theme/scr-thumb.png');
+    background-image: url('../ri/def_theme/bullet.png');
+    background-color: rgba(0,0,0,0.1);
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 30px;
+}
+
+::-webkit-scrollbar-corner {
+    background: rgba(0, 0, 0, 0);
+}

@@ -200,7 +200,7 @@ function loc(e1, e2){
 function drawArrow(f,s){
     var location = loc(s, f);
     $('.arrow-holder').remove();
-    $('body').prepend('<div class="arrow-holder"></div>');
+    $('body').prepend('<div class="arrow-holder"><img src="../ri/arrowu.png" /></div>');
     $('.arrow-holder').css({
         'top': location.top,
         'left': location.left,
@@ -575,6 +575,11 @@ function setChapterBindings(){
     resetTabs();
     makeTabs();
 
+    $('.board-scroller').kinetic({
+        'moved': function(){ console.log('on'); $('body').addClass('inselectable'); },
+        'stopped': function(){ console.log('done'); $('body').removeClass('inselectable'); }
+    })
+
     $('.curled').each(function(){
         /*
         Lato:
@@ -660,7 +665,7 @@ function setChapterBindings(){
         function(){
             cncmode = my_clipboard.getMode('cncmode');
             pastemode = my_clipboard.getMode('pastemode');
-            if(cncmode)
+            if(0 && cncmode)
                 $(this).removeClass('cnp');
         }
     );
@@ -1088,6 +1093,8 @@ $(document).keyup(function(e) {
 $(document).ready(function(){
     resetTabs();
     makeTabs();
+
+    $('body').mouseup(function(){$('body').removeClass('inselectable');});
 
     $('.preview_game').click(function(){
         new game_preview();

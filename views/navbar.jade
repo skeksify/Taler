@@ -3,8 +3,8 @@ nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
     .container
         #navbar.navbar-collapse
             ul.nav.navbar-nav
-                li(class=(page=='home'?'active':''))
-                    a(href='/') Home
+                li.home(class=(page=='home'?'active':''))
+                    a(href='/') TALE-MAKER
                 if loggedin
                     if 0
                         li(class=(page=='create_character'?'active':''))

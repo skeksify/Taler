@@ -29,7 +29,7 @@ input[type=text]{
 
 .drawing_panel {
     background-color: #262626;
-    border: 1px solid rgb(77, 77, 77);
+    border: 0px solid rgb(77, 77, 77);
     padding: 20px;
 }
 
@@ -341,7 +341,7 @@ div.code {
     border: 1px solid;
     border-radius: 7px;
     padding: 10px 20px;
-    z-index: 10;
+    z-index: 100;
     background-color: rgba(50, 50, 50, 0.2);
 }
 
@@ -367,7 +367,7 @@ div.code {
     border-radius: 7px;
     padding: 10px 20px;
     text-align: center;
-    z-index: 10;
+    z-index: 100;
     background-color: rgba(50, 50, 50, 0.2);
 }
 #legend>div {
@@ -493,13 +493,16 @@ div.code {
 .arrow-holder {
     position: absolute;
     border: 0px solid;
-    background-image: url('../ri/arrowu.png');
-    background-repeat: round;
+    /*background-image: url('../ri/arrowu.png');
+    background-repeat: round;*/
     opacity: 0.15;
     pointer-events: none;
     z-index: 10;
 }
 
 
-
-
+.arrow-holder img{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}

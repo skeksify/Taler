@@ -10,6 +10,7 @@ block content
         | redraw();
         | });
     link(href='/rs/storyline_editor.css', rel='stylesheet')
+    link(href='/rs/def_theme.css', rel='stylesheet')
     #legend.reg
         .title
             | Legend <br/><br/>
@@ -40,8 +41,6 @@ block content
             .closer.reg X
             .entry
             .options
-    .game_title
-        = game.title
     #floater
         .top-bar
             .title
@@ -56,8 +55,11 @@ block content
                     i.fa.fa-trash-o.link
         .content
     .game
+        .game_title
+            = game.title
         ul#tabs
         .chapters
 block scripts
     // script(type='text/javascript', src='/rj/jquery.jsPlumb-1.7.2-min.js')
+    script(type='text/javascript', src='/rj/jquery.kinetic-2.0.4.js')
     script(type='text/javascript', src='/rj/storyline_editor.js')
